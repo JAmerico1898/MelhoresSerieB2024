@@ -4281,7 +4281,7 @@ elif choose == "Ranking de Jogadores":
     st.markdown("---")
     jogadores = st.selectbox("Digite o nome de seu jogador. A grafia deve ser exata!", options=jogadores, index=None, placeholder="Jogador")
     temporada = 2024
-    liga = 'BRA1'
+    liga = 'BRA2'
     if jogadores:
         df3 = df.loc[(df['Atleta']==jogadores)]
         posição = df3['Posição'].unique()
