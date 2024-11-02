@@ -35,7 +35,7 @@ with st.sidebar:
 if choose == "Melhores do Brasileirão-2024":
     
     #CABEÇALHO DO FORM
-    st.markdown("<h1 style='text-align: center;'>Melhores do Brasileirão até a Rodada 25</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>Melhores do Brasileirão até a Rodada 31</h1>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align: center;'>app by @JAmerico1898</h6>", unsafe_allow_html=True)
     st.markdown("---")
 
@@ -4271,7 +4271,7 @@ if choose == "Melhores do Brasileirão-2024":
 elif choose == "Ranking de Jogadores":
     
     #CABEÇALHO DO FORM
-    st.markdown("<h1 style='text-align: center;'>Melhores do Brasileirão até a Rodada 25</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>Melhores do Brasileirão até a Rodada 31</h1>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align: center;'>app by @JAmerico1898</h6>", unsafe_allow_html=True)
     st.markdown("---")
 
@@ -4429,22 +4429,28 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
 
             # Styling DataFrame using Pandas
@@ -4505,29 +4511,39 @@ elif choose == "Ranking de Jogadores":
                 main()
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
+                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
                 
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
@@ -5038,25 +5054,29 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
-
-
 
 
             # Styling DataFrame using Pandas
@@ -5116,29 +5136,40 @@ elif choose == "Ranking de Jogadores":
                 main()
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
-                
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
@@ -5587,25 +5618,29 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
-
-
 
             # Styling DataFrame using Pandas
             def style_table(df):
@@ -5664,35 +5699,46 @@ elif choose == "Ranking de Jogadores":
                 main()
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
-                
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
             # Call the function to plot the legend and display it in Streamlit
             legend_fig = plot_color_legend()
-            st.pyplot(legend_fig)
+            st.pyplot(legend_fig)            
 
             ##################################################################################################################### 
             #####################################################################################################################
@@ -6118,22 +6164,28 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
 
 
@@ -6191,35 +6243,46 @@ elif choose == "Ranking de Jogadores":
                 main()
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
-                
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
             # Call the function to plot the legend and display it in Streamlit
             legend_fig = plot_color_legend()
-            st.pyplot(legend_fig)
+            st.pyplot(legend_fig)            
 
             ##################################################################################################################### 
             #####################################################################################################################
@@ -6645,22 +6708,28 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
 
             # Styling DataFrame using Pandas
@@ -6720,35 +6789,46 @@ elif choose == "Ranking de Jogadores":
 
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
-                
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
             # Call the function to plot the legend and display it in Streamlit
             legend_fig = plot_color_legend()
-            st.pyplot(legend_fig)
+            st.pyplot(legend_fig)            
 
             ##################################################################################################################### 
             #####################################################################################################################
@@ -7165,22 +7245,28 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
 
             # Styling DataFrame using Pandas
@@ -7240,35 +7326,46 @@ elif choose == "Ranking de Jogadores":
 
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
-                
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
             # Call the function to plot the legend and display it in Streamlit
             legend_fig = plot_color_legend()
-            st.pyplot(legend_fig)
+            st.pyplot(legend_fig)            
 
             ##################################################################################################################### 
             #####################################################################################################################
@@ -7620,22 +7717,28 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
 
 
@@ -7696,35 +7799,46 @@ elif choose == "Ranking de Jogadores":
                 main()
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
-                
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
             # Call the function to plot the legend and display it in Streamlit
             legend_fig = plot_color_legend()
-            st.pyplot(legend_fig)
+            st.pyplot(legend_fig)            
 
             ##################################################################################################################### 
             #####################################################################################################################
@@ -8010,24 +8124,29 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
-
 
             # Styling DataFrame using Pandas
             def style_table(df):
@@ -8088,35 +8207,46 @@ elif choose == "Ranking de Jogadores":
 
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
-                
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
             # Call the function to plot the legend and display it in Streamlit
             legend_fig = plot_color_legend()
-            st.pyplot(legend_fig)
+            st.pyplot(legend_fig)            
 
             ##################################################################################################################### 
             #####################################################################################################################
@@ -8480,22 +8610,28 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
 
             # Styling DataFrame using Pandas
@@ -8553,35 +8689,46 @@ elif choose == "Ranking de Jogadores":
 
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
-                
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
             # Call the function to plot the legend and display it in Streamlit
             legend_fig = plot_color_legend()
-            st.pyplot(legend_fig)
+            st.pyplot(legend_fig)            
 
             ##################################################################################################################### 
             #####################################################################################################################
@@ -8861,24 +9008,29 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
-
 
             # Styling DataFrame using Pandas
             def style_table(df):
@@ -8938,35 +9090,46 @@ elif choose == "Ranking de Jogadores":
 
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
-                
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
             # Call the function to plot the legend and display it in Streamlit
             legend_fig = plot_color_legend()
-            st.pyplot(legend_fig)
+            st.pyplot(legend_fig)            
 
             ##################################################################################################################### 
             #####################################################################################################################
@@ -9201,22 +9364,28 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
 
             # Styling DataFrame using Pandas
@@ -9276,35 +9445,46 @@ elif choose == "Ranking de Jogadores":
 
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
-                
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
             # Call the function to plot the legend and display it in Streamlit
             legend_fig = plot_color_legend()
-            st.pyplot(legend_fig)
+            st.pyplot(legend_fig)            
 
             #####################################################################################################################
             #####################################################################################################################
@@ -9663,22 +9843,28 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
 
             # Styling DataFrame using Pandas
@@ -9739,35 +9925,46 @@ elif choose == "Ranking de Jogadores":
 
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
-                
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
             # Call the function to plot the legend and display it in Streamlit
             legend_fig = plot_color_legend()
-            st.pyplot(legend_fig)
+            st.pyplot(legend_fig)            
 
             ##################################################################################################################### 
             #####################################################################################################################
@@ -10005,22 +10202,28 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
 
             # Styling DataFrame using Pandas
@@ -10079,35 +10282,46 @@ elif choose == "Ranking de Jogadores":
 
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
-                
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
             # Call the function to plot the legend and display it in Streamlit
             legend_fig = plot_color_legend()
-            st.pyplot(legend_fig)
+            st.pyplot(legend_fig)            
 
             ##################################################################################################################### 
             #####################################################################################################################
@@ -10391,22 +10605,28 @@ elif choose == "Ranking de Jogadores":
             def color_percentil(val):
                 # Color map for "Blues" from Matplotlib
                 cmap = plt.get_cmap('Blues')
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
 
-                # Define categories and corresponding thresholds
-                if val >= 90:
-                    color = cmap(0.8)  # "Elite"
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 75 <= val < 90:
-                    color = cmap(0.65)  # "Destaque"
+                    color = cmap2(0.50)  # "Destaque"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 60 <= val < 75:
-                    color = cmap(0.5)  # "Razoável"
+                    color = cmap(0.50)  # "Razoável"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 elif 40 <= val < 60:
-                    color = cmap(0.35)  # "Mediano"
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
                 else:
-                    color = cmap(0.2)  # "Fraco"
+                    color = cmap1(0.50)  # Orange color for "Frágil"
                     return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
 
             # Styling DataFrame using Pandas
@@ -10466,35 +10686,46 @@ elif choose == "Ranking de Jogadores":
 
 
             # Function to plot the legend for the 5 colors from the Blues colormap
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
             def plot_color_legend():
-                # Create a list of 5 normalized values (from lowest to highest)
-                values = np.linspace(0, 0.5, 5)  # Normalized between 0 and 0.5 to cover half of the Blues colormap
-                
-                # Generate corresponding colors using the 'Blues' colormap
-                colors = plt.cm.Blues(values)
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
                 
                 # Labels for the legend (highest to lowest)
-                labels = ['Elite (>90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (<40)']
-                
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
                 # Plot the legend horizontally with a smaller size
-                fig, ax = plt.subplots(figsize=(6, 0.2))  # Smaller layout
-                for i, (label, color) in enumerate(zip(labels[::-1], colors)):  # Reverse labels for display
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
                     ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
-                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=7)  # Add text inside the rectangles
-                
-                ax.set_xlim(0, 5)
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
                 ax.set_ylim(0, 1)
                 ax.axis('off')  # Remove axes
-                
+
                 # Add an arrow pointing from "Highest" to "Lowest"
-                ax.annotate('', xy=(5, 1), xytext=(0, 1),
-                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.3, headwidth=5))
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
 
                 return fig
 
             # Call the function to plot the legend and display it in Streamlit
             legend_fig = plot_color_legend()
-            st.pyplot(legend_fig)
+            st.pyplot(legend_fig)            
 
             ##################################################################################################################### 
             #####################################################################################################################
@@ -10659,7 +10890,7 @@ elif choose == "Ranking de Jogadores":
 if choose == "Compare Jogadores":
     
     #CABEÇALHO DO FORM
-    st.markdown("<h1 style='text-align: center;'>Melhores do Brasileirão até a Rodada 25</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>Melhores do Brasileirão até a Rodada 31</h1>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align: center;'>app by @JAmerico1898</h6>", unsafe_allow_html=True)
     st.markdown("---")
 
@@ -10762,6 +10993,257 @@ if choose == "Compare Jogadores":
             st.pyplot(fig)
 
 ######################################################################################################################################
+            # Define column metricas
+            metricas = ['Duelos Aéreos Ganhos', 'Defesas',	'Gols Evitados',
+                            'Saídas',	'Interceptações',	'xG Evitado',
+                            'Finalizações por Gol Sofrido']
+
+            # #Elaborar Tabela com Métricas do Atleta
+            jogador_1_metrics = pd.read_csv('1_Role_Goleiro.csv')
+            jogador_1_percents = pd.read_csv('PlayerAnalysis_Role_1.csv')
+            #Collecting metrics for jogador_1
+            jogador_1_metrics = jogador_1_metrics[
+            ((jogador_1_metrics['Atleta'] == jogador_1) & (jogador_1_metrics['Equipe'] == equipe_1))]
+            jogador_1_metrics = jogador_1_metrics.iloc[:, np.r_[1, 18:25]].reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_1_metrics = jogador_1_metrics.round(decimals=2)
+            jogador_1_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_1
+            jogador_1_percents = jogador_1_percents[
+            ((jogador_1_percents['Atleta'] == jogador_1) & (jogador_1_percents['Equipe'] == equipe_1))]
+            jogador_1_percents = jogador_1_percents.iloc[:, np.r_[9, 48:55]].reset_index(drop=True)
+            jogador_1_percents = jogador_1_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_1_percents = jogador_1_percents.round(decimals=0)
+            jogador_1_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_1 + "_percent"
+            jogador_1_percents.iloc[0, 0] = jogador_1 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_1_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_1_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_1_metrics = pd.concat([jogador_1_metrics, jogador_1_percents])
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_1_metrics.columns = jogador_1_metrics.iloc[0]  # Set the first row as the header
+            jogador_1_metrics = jogador_1_metrics.drop(jogador_1_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics.insert(0, 'Métricas', metricas)
+            
+            
+#################################################################################################################
+
+            # #Elaborar Tabela com Métricas do Jogador_2
+            jogador_2_metrics = pd.read_csv('1_Role_Goleiro.csv')
+            jogador_2_percents = pd.read_csv('PlayerAnalysis_Role_1.csv')
+            #Collecting metrics for jogador_2
+            jogador_2_metrics = jogador_2_metrics[
+            ((jogador_2_metrics['Atleta'] == jogador_2) & (jogador_2_metrics['Equipe'] == equipe_2))]
+            jogador_2_metrics = jogador_2_metrics.iloc[:, np.r_[1, 18:25]].reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_2_metrics = jogador_2_metrics.round(decimals=2)
+            jogador_2_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_2
+            jogador_2_percents = jogador_2_percents[
+            ((jogador_2_percents['Atleta'] == jogador_2) & (jogador_2_percents['Equipe'] == equipe_2))]
+            jogador_2_percents = jogador_2_percents.iloc[:, np.r_[9, 48:55]].reset_index(drop=True)
+            jogador_2_percents = jogador_2_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_2_percents = jogador_2_percents.round(decimals=0)
+            jogador_2_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_2 + "_percent"
+            jogador_2_percents.iloc[0, 0] = jogador_2 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_2_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_2_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_2_metrics = pd.concat([jogador_2_metrics, jogador_2_percents])
+            jogador_2_metrics = jogador_2_metrics.reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_2_metrics.columns = jogador_2_metrics.iloc[0]  # Set the first row as the header
+            jogador_2_metrics = jogador_2_metrics.drop(jogador_2_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_2_metrics.insert(0, 'Métricas', metricas)
+            
+
+
+            # Function to apply conditional formatting based on the percentile values
+            def apply_colormap_based_on_value(val):
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 75 <= val < 90:
+                    color = cmap2(0.50)  # "Destaque"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 60 <= val < 75:
+                    color = cmap(0.50)  # "Razoável"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 40 <= val < 60:
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                else:
+                    color = cmap1(0.50)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+            # Function to apply the colormap to a specified column based on the corresponding percentiles column
+            def apply_colormap_to_column_based_on_percentiles(styler, df, values_col, percentiles_col):
+                colormap_styles = [apply_colormap_based_on_value(val) for val in df[percentiles_col]]
+                return styler.apply(lambda _: colormap_styles, subset=[values_col])
+
+            # Function to merge jogador_1_metrics and jogador_2_metrics
+            def merge_metrics_tables(jogador_1_metrics, jogador_2_metrics):
+                # Rename the columns for each player
+                jogador_1_metrics.columns = ['Métricas', jogador_1, 'Player 1 Percentiles']
+                jogador_2_metrics.columns = ['Métricas', jogador_2, 'Player 2 Percentiles']
+
+                # Merge the two DataFrames on the "Métricas" column
+                merged_df = pd.merge(jogador_1_metrics[['Métricas', jogador_1, 'Player 1 Percentiles']],
+                                    jogador_2_metrics[['Métricas', jogador_2, 'Player 2 Percentiles']],
+                                    on='Métricas')
+
+                return merged_df
+
+
+            # Styling function for merged DataFrame
+            def style_merged_table(merged_df):
+                # Create a Styler object from the merged DataFrame
+                styled_df = merged_df.style
+
+                # Apply colormap to jogador_1 values based on Player 1 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_1, 'Player 1 Percentiles')
+
+                # Apply colormap to jogador_2 values based on Player 2 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_2, 'Player 2 Percentiles')
+                
+                # Format both jogador_1 and jogador_2 columns to display 2 decimal places
+                styled_df = styled_df.format({jogador_1: "{:.2f}", jogador_2: "{:.2f}"})
+                
+                # Left-align column[0] ("Métricas") and center columns[1, 2] ("jogador_1" and "jogador_2")
+                styled_df = styled_df.set_properties(subset=['Métricas'], **{'text-align': 'left'})
+                styled_df = styled_df.set_properties(subset=[jogador_1, jogador_2], **{'text-align': 'center'})
+
+                # Drop both percentile columns from the final display
+                styled_df = styled_df.hide(axis='columns', subset=['Player 1 Percentiles', 'Player 2 Percentiles'])
+
+                # Apply table styles as in the LAST CODE
+                styled_df = styled_df.set_table_styles(
+                    [{
+                        'selector': 'thead th',
+                        'props': [('font-weight', 'bold'),
+                                ('border-style', 'solid'),
+                                ('border-width', '0px 0px 2px 0px'),
+                                ('border-color', 'black')]
+                    }, {
+                        'selector': 'thead th:not(:first-child)',
+                        'props': [('text-align', 'center')]  # Center headers except the first
+                    }, {
+                        'selector': 'thead th:last-child',
+                        'props': [('color', 'black')]  # Make last column header black
+                    }, {
+                        'selector': 'td',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'center')]
+                    }, {
+                        'selector': 'th',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'left')]
+                    }]
+                ).set_properties(**{'padding': '2px', 'font-size': '15px'})
+
+                return styled_df
+
+
+
+            # Main function to process the data
+            def main():
+                # Assuming jogador_1_metrics and jogador_2_metrics are already defined with the necessary columns (Métricas, Values, Percentiles)
+
+                # Merge the two tables
+                merged_metrics = merge_metrics_tables(jogador_1_metrics, jogador_2_metrics)
+
+                # Style the merged table
+                styled_merged_metrics = style_merged_table(merged_metrics)
+
+                # Convert to HTML and display (for Streamlit, you'd use st.markdown)
+                merged_html = styled_merged_metrics.to_html(escape=False, index=False)
+                center_html = f"<div style='margin-left: auto; margin-right: auto; width: fit-content;'>{merged_html}</div>"
+
+                # Output the final table (for Streamlit, you'd use st.markdown)
+                st.markdown(center_html, unsafe_allow_html=True)
+                
+            if __name__ == '__main__':
+                main()
+
+
+            # Function to plot the legend using the same colors as the apply_colormap_based_on_value function
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
+            def plot_color_legend():
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
+                
+                # Labels for the legend (highest to lowest)
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
+                # Plot the legend horizontally with a smaller size
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
+                    ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
+                ax.set_ylim(0, 1)
+                ax.axis('off')  # Remove axes
+
+                # Add an arrow pointing from "Highest" to "Lowest"
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
+
+                return fig
+
+            # Call the function to plot the legend and display it in Streamlit
+            legend_fig = plot_color_legend()
+            st.pyplot(legend_fig)            
+
+######################################################################################################################################
 ######################################################################################################################################
 
         elif (posição_1 == posição_2 == ("Lateral")):
@@ -10771,13 +11253,11 @@ if choose == "Compare Jogadores":
             Lateral_Charts = pd.read_csv('PlayerAnalysis_Role_5.csv')
 
             Lateral_Charts_1 = Lateral_Charts[
-            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe'] == equipe_1)) |
-            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe'] == equipe_2))
+            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_1)) |
+            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_2))
             ]
-
             # Reindex to ensure the correct order
             Lateral_Charts_1 = Lateral_Charts_1.set_index('Atleta').loc[[jogador_1, jogador_2]].reset_index()
-
             # Create a dictionary of columns to rename by removing the '_percentil' suffix
             columns_to_rename = {
                 col: col.replace('_Percentil', '') for col in Lateral_Charts_1.columns if '_Percentil' in col
@@ -10894,6 +11374,258 @@ if choose == "Compare Jogadores":
             st.pyplot(fig)
 
 ######################################################################################################################################
+
+            # Define column metricas
+            metricas = ["Ações Defensivas BemSucedidas", "Duelos Defensivos Ganhos", "Duelos Aéreos Ganhos", 
+                        "Passes Longos Certos", "Passes Progressivos Certos", "Passes Laterais Certos", 
+                        "Ações Ofensivas BemSucedidas", "Duelos Ofensivos Ganhos", "Pisadas Área", 
+                        "Dribles BemSucedidos", "Corridas Progressivas", "Acelerações", "xA", "Assistência Finalização", 
+                        "Passes TerçoFinal Certos", "Deep Completions", "Deep Completed Crosses", "Passes ÁreaPênalti Certos"
+                        ]
+
+            # #Elaborar Tabela com Métricas do Atleta
+            jogador_1_metrics = pd.read_csv('5_Role_Lateral_Equilibrado.csv')
+            jogador_1_percents = pd.read_csv('PlayerAnalysis_Role_5.csv')
+            #Collecting metrics for jogador_1
+            jogador_1_metrics = jogador_1_metrics[
+            ((jogador_1_metrics['Atleta'] == jogador_1) & (jogador_1_metrics['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_metrics = jogador_1_metrics.iloc[:, np.r_[1, 18:36]].reset_index(drop=True)
+            #jogador_1_metrics = jogador_1_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_1_metrics = jogador_1_metrics.round(decimals=2)
+            jogador_1_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_1
+            jogador_1_percents = jogador_1_percents[
+            ((jogador_1_percents['Atleta'] == jogador_1) & (jogador_1_percents['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_percents = jogador_1_percents.iloc[:, np.r_[20, 81:99]].reset_index(drop=True)
+            #jogador_1_percents = jogador_1_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_1_percents = jogador_1_percents.round(decimals=0)
+            jogador_1_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_1 + "_percent"
+            jogador_1_percents.iloc[0, 0] = jogador_1 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_1_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_1_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_1_metrics = pd.concat([jogador_1_metrics, jogador_1_percents])
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_1_metrics.columns = jogador_1_metrics.iloc[0]  # Set the first row as the header
+            jogador_1_metrics = jogador_1_metrics.drop(jogador_1_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics.insert(0, 'Métricas', metricas)
+            
+            
+#################################################################################################################
+
+            # #Elaborar Tabela com Métricas do Jogador_2
+            jogador_2_metrics = pd.read_csv('5_Role_Lateral_Equilibrado.csv')
+            jogador_2_percents = pd.read_csv('PlayerAnalysis_Role_5.csv')
+            #Collecting metrics for jogador_2
+            jogador_2_metrics = jogador_2_metrics[
+            ((jogador_2_metrics['Atleta'] == jogador_2) & (jogador_2_metrics['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_metrics = jogador_2_metrics.iloc[:, np.r_[1, 18:36]].reset_index(drop=True)
+            #jogador_2_metrics = jogador_2_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_2_metrics = jogador_2_metrics.round(decimals=2)
+            jogador_2_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_2
+            jogador_2_percents = jogador_2_percents[
+            ((jogador_2_percents['Atleta'] == jogador_2) & (jogador_2_percents['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_percents = jogador_2_percents.iloc[:, np.r_[20, 81:99]].reset_index(drop=True)
+            #jogador_2_percents = jogador_2_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_2_percents = jogador_2_percents.round(decimals=0)
+            jogador_2_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_2 + "_percent"
+            jogador_2_percents.iloc[0, 0] = jogador_2 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_2_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_2_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_2_metrics = pd.concat([jogador_2_metrics, jogador_2_percents])
+            jogador_2_metrics = jogador_2_metrics.reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_2_metrics.columns = jogador_2_metrics.iloc[0]  # Set the first row as the header
+            jogador_2_metrics = jogador_2_metrics.drop(jogador_2_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_2_metrics.insert(0, 'Métricas', metricas)
+            
+
+
+            # Function to apply conditional formatting based on the percentile values
+            def apply_colormap_based_on_value(val):
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 75 <= val < 90:
+                    color = cmap2(0.50)  # "Destaque"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 60 <= val < 75:
+                    color = cmap(0.50)  # "Razoável"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 40 <= val < 60:
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                else:
+                    color = cmap1(0.50)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+            # Function to apply the colormap to a specified column based on the corresponding percentiles column
+            def apply_colormap_to_column_based_on_percentiles(styler, df, values_col, percentiles_col):
+                colormap_styles = [apply_colormap_based_on_value(val) for val in df[percentiles_col]]
+                return styler.apply(lambda _: colormap_styles, subset=[values_col])
+
+            # Function to merge jogador_1_metrics and jogador_2_metrics
+            def merge_metrics_tables(jogador_1_metrics, jogador_2_metrics):
+                # Rename the columns for each player
+                jogador_1_metrics.columns = ['Métricas', jogador_1, 'Player 1 Percentiles']
+                jogador_2_metrics.columns = ['Métricas', jogador_2, 'Player 2 Percentiles']
+
+                # Merge the two DataFrames on the "Métricas" column
+                merged_df = pd.merge(jogador_1_metrics[['Métricas', jogador_1, 'Player 1 Percentiles']],
+                                    jogador_2_metrics[['Métricas', jogador_2, 'Player 2 Percentiles']],
+                                    on='Métricas')
+
+                return merged_df
+
+            # Styling function for merged DataFrame
+            def style_merged_table(merged_df):
+                # Create a Styler object from the merged DataFrame
+                styled_df = merged_df.style
+
+                # Apply colormap to jogador_1 values based on Player 1 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_1, 'Player 1 Percentiles')
+
+                # Apply colormap to jogador_2 values based on Player 2 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_2, 'Player 2 Percentiles')
+                
+                # Format both jogador_1 and jogador_2 columns to display 2 decimal places
+                styled_df = styled_df.format({jogador_1: "{:.2f}", jogador_2: "{:.2f}"})
+                
+                # Left-align column[0] ("Métricas") and center columns[1, 2] ("jogador_1" and "jogador_2")
+                styled_df = styled_df.set_properties(subset=['Métricas'], **{'text-align': 'left'})
+                styled_df = styled_df.set_properties(subset=[jogador_1, jogador_2], **{'text-align': 'center'})
+
+                # Drop both percentile columns from the final display
+                styled_df = styled_df.hide(axis='columns', subset=['Player 1 Percentiles', 'Player 2 Percentiles'])
+
+                # Apply table styles as in the LAST CODE
+                styled_df = styled_df.set_table_styles(
+                    [{
+                        'selector': 'thead th',
+                        'props': [('font-weight', 'bold'),
+                                ('border-style', 'solid'),
+                                ('border-width', '0px 0px 2px 0px'),
+                                ('border-color', 'black')]
+                    }, {
+                        'selector': 'thead th:not(:first-child)',
+                        'props': [('text-align', 'center')]  # Center headers except the first
+                    }, {
+                        'selector': 'thead th:last-child',
+                        'props': [('color', 'black')]  # Make last column header black
+                    }, {
+                        'selector': 'td',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'center')]
+                    }, {
+                        'selector': 'th',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'left')]
+                    }]
+                ).set_properties(**{'padding': '2px', 'font-size': '15px'})
+
+                return styled_df
+
+            # Main function to process the data
+            def main():
+                # Assuming jogador_1_metrics and jogador_2_metrics are already defined with the necessary columns (Métricas, Values, Percentiles)
+
+                # Merge the two tables
+                merged_metrics = merge_metrics_tables(jogador_1_metrics, jogador_2_metrics)
+
+                # Style the merged table
+                styled_merged_metrics = style_merged_table(merged_metrics)
+
+                # Convert to HTML and display (for Streamlit, you'd use st.markdown)
+                merged_html = styled_merged_metrics.to_html(escape=False, index=False)
+                center_html = f"<div style='margin-left: auto; margin-right: auto; width: fit-content;'>{merged_html}</div>"
+
+                # Output the final table (for Streamlit, you'd use st.markdown)
+                st.markdown(center_html, unsafe_allow_html=True)
+
+            if __name__ == '__main__':
+                main()
+
+
+            # Function to plot the legend using the same colors as the apply_colormap_based_on_value function
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+            
+            def plot_color_legend():
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
+                
+                # Labels for the legend (highest to lowest)
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
+                # Plot the legend horizontally with a smaller size
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
+                    ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
+                ax.set_ylim(0, 1)
+                ax.axis('off')  # Remove axes
+
+                # Add an arrow pointing from "Highest" to "Lowest"
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
+
+                return fig
+
+            # Call the function to plot the legend and display it in Streamlit
+            legend_fig = plot_color_legend()
+            st.pyplot(legend_fig)            
+
+######################################################################################################################################
 ######################################################################################################################################
 
         elif (posição_1 == posição_2 == ("Zagueiro")):
@@ -10903,8 +11635,8 @@ if choose == "Compare Jogadores":
             Lateral_Charts = pd.read_csv('PlayerAnalysis_Role_8.csv')
 
             Lateral_Charts_1 = Lateral_Charts[
-            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe'] == equipe_1)) |
-            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe'] == equipe_2))
+            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_1)) |
+            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_2))
             ]
 
             # Reindex to ensure the correct order
@@ -11025,6 +11757,255 @@ if choose == "Compare Jogadores":
             )
             st.pyplot(fig)
 
+######################################################################################################################################
+######################################################################################################################################
+            # Define column metricas
+            metricas = ["Ações Defensivas BemSucedidas", "Duelos Defensivos Ganhos", "Duelos Aéreos Ganhos", 
+                        "Finalizações Bloqueadas", "Interceptações Ajustadas a Posse", "Passes Longos Certos", 
+                        "Passes Frontais Certos", "Passes Progressivos Certos", "Passes Laterais Certos", 
+                        "Duelos Ofensivos Ganhos", "Dribles BemSucedidos", "Corridas Progressivas", "Passes TerçoFinal Certos"]
+
+            # #Elaborar Tabela com Métricas do Atleta
+            jogador_1_metrics = pd.read_csv('8_Role_Zagueiro_Equilibrado.csv')
+            jogador_1_percents = pd.read_csv('PlayerAnalysis_Role_8.csv')
+            #Collecting metrics for jogador_1
+            jogador_1_metrics = jogador_1_metrics[
+            ((jogador_1_metrics['Atleta'] == jogador_1) & (jogador_1_metrics['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_metrics = jogador_1_metrics.iloc[:, np.r_[1, 18:31]].reset_index(drop=True)
+            #jogador_1_metrics = jogador_1_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_1_metrics = jogador_1_metrics.round(decimals=2)
+            jogador_1_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_1
+            jogador_1_percents = jogador_1_percents[
+            ((jogador_1_percents['Atleta'] == jogador_1) & (jogador_1_percents['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_percents = jogador_1_percents.iloc[:, np.r_[15, 66:79]].reset_index(drop=True)
+            #jogador_1_percents = jogador_1_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_1_percents = jogador_1_percents.round(decimals=0)
+            jogador_1_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_1 + "_percent"
+            jogador_1_percents.iloc[0, 0] = jogador_1 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_1_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_1_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_1_metrics = pd.concat([jogador_1_metrics, jogador_1_percents])
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_1_metrics.columns = jogador_1_metrics.iloc[0]  # Set the first row as the header
+            jogador_1_metrics = jogador_1_metrics.drop(jogador_1_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics.insert(0, 'Métricas', metricas)
+            
+            
+#################################################################################################################
+
+            # #Elaborar Tabela com Métricas do Jogador_2
+            jogador_2_metrics = pd.read_csv('8_Role_Zagueiro_Equilibrado.csv')
+            jogador_2_percents = pd.read_csv('PlayerAnalysis_Role_8.csv')
+            #Collecting metrics for jogador_2
+            jogador_2_metrics = jogador_2_metrics[
+            ((jogador_2_metrics['Atleta'] == jogador_2) & (jogador_2_metrics['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_metrics = jogador_2_metrics.iloc[:, np.r_[1, 18:31]].reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_2_metrics = jogador_2_metrics.round(decimals=2)
+            jogador_2_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_2
+            jogador_2_percents = jogador_2_percents[
+            ((jogador_2_percents['Atleta'] == jogador_2) & (jogador_2_percents['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_percents = jogador_2_percents.iloc[:, np.r_[15, 66:79]].reset_index(drop=True)
+            #jogador_2_percents = jogador_2_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_2_percents = jogador_2_percents.round(decimals=0)
+            jogador_2_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_2 + "_percent"
+            jogador_2_percents.iloc[0, 0] = jogador_2 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_2_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_2_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_2_metrics = pd.concat([jogador_2_metrics, jogador_2_percents])
+            jogador_2_metrics = jogador_2_metrics.reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_2_metrics.columns = jogador_2_metrics.iloc[0]  # Set the first row as the header
+            jogador_2_metrics = jogador_2_metrics.drop(jogador_2_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_2_metrics.insert(0, 'Métricas', metricas)
+            
+
+
+            # Function to apply conditional formatting based on the percentile values
+            def apply_colormap_based_on_value(val):
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 75 <= val < 90:
+                    color = cmap2(0.50)  # "Destaque"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 60 <= val < 75:
+                    color = cmap(0.50)  # "Razoável"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 40 <= val < 60:
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                else:
+                    color = cmap1(0.50)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+            # Function to apply the colormap to a specified column based on the corresponding percentiles column
+            def apply_colormap_to_column_based_on_percentiles(styler, df, values_col, percentiles_col):
+                colormap_styles = [apply_colormap_based_on_value(val) for val in df[percentiles_col]]
+                return styler.apply(lambda _: colormap_styles, subset=[values_col])
+
+            # Function to merge jogador_1_metrics and jogador_2_metrics
+            def merge_metrics_tables(jogador_1_metrics, jogador_2_metrics):
+                # Rename the columns for each player
+                jogador_1_metrics.columns = ['Métricas', jogador_1, 'Player 1 Percentiles']
+                jogador_2_metrics.columns = ['Métricas', jogador_2, 'Player 2 Percentiles']
+
+                # Merge the two DataFrames on the "Métricas" column
+                merged_df = pd.merge(jogador_1_metrics[['Métricas', jogador_1, 'Player 1 Percentiles']],
+                                    jogador_2_metrics[['Métricas', jogador_2, 'Player 2 Percentiles']],
+                                    on='Métricas')
+
+                return merged_df
+
+            # Styling function for merged DataFrame
+            def style_merged_table(merged_df):
+                # Create a Styler object from the merged DataFrame
+                styled_df = merged_df.style
+
+                # Apply colormap to jogador_1 values based on Player 1 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_1, 'Player 1 Percentiles')
+
+                # Apply colormap to jogador_2 values based on Player 2 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_2, 'Player 2 Percentiles')
+                
+                # Format both jogador_1 and jogador_2 columns to display 2 decimal places
+                styled_df = styled_df.format({jogador_1: "{:.2f}", jogador_2: "{:.2f}"})
+                
+                # Left-align column[0] ("Métricas") and center columns[1, 2] ("jogador_1" and "jogador_2")
+                styled_df = styled_df.set_properties(subset=['Métricas'], **{'text-align': 'left'})
+                styled_df = styled_df.set_properties(subset=[jogador_1, jogador_2], **{'text-align': 'center'})
+
+                # Drop both percentile columns from the final display
+                styled_df = styled_df.hide(axis='columns', subset=['Player 1 Percentiles', 'Player 2 Percentiles'])
+
+                # Apply table styles as in the LAST CODE
+                styled_df = styled_df.set_table_styles(
+                    [{
+                        'selector': 'thead th',
+                        'props': [('font-weight', 'bold'),
+                                ('border-style', 'solid'),
+                                ('border-width', '0px 0px 2px 0px'),
+                                ('border-color', 'black')]
+                    }, {
+                        'selector': 'thead th:not(:first-child)',
+                        'props': [('text-align', 'center')]  # Center headers except the first
+                    }, {
+                        'selector': 'thead th:last-child',
+                        'props': [('color', 'black')]  # Make last column header black
+                    }, {
+                        'selector': 'td',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'center')]
+                    }, {
+                        'selector': 'th',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'left')]
+                    }]
+                ).set_properties(**{'padding': '2px', 'font-size': '15px'})
+
+                return styled_df
+
+            # Main function to process the data
+            def main():
+                # Assuming jogador_1_metrics and jogador_2_metrics are already defined with the necessary columns (Métricas, Values, Percentiles)
+
+                # Merge the two tables
+                merged_metrics = merge_metrics_tables(jogador_1_metrics, jogador_2_metrics)
+
+                # Style the merged table
+                styled_merged_metrics = style_merged_table(merged_metrics)
+
+                # Convert to HTML and display (for Streamlit, you'd use st.markdown)
+                merged_html = styled_merged_metrics.to_html(escape=False, index=False)
+                center_html = f"<div style='margin-left: auto; margin-right: auto; width: fit-content;'>{merged_html}</div>"
+
+                # Output the final table (for Streamlit, you'd use st.markdown)
+                st.markdown(center_html, unsafe_allow_html=True)
+
+            if __name__ == '__main__':
+                main()
+
+
+            # Function to plot the legend using the same colors as the apply_colormap_based_on_value function
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
+            def plot_color_legend():
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
+                
+                # Labels for the legend (highest to lowest)
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
+                # Plot the legend horizontally with a smaller size
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
+                    ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
+                ax.set_ylim(0, 1)
+                ax.axis('off')  # Remove axes
+
+                # Add an arrow pointing from "Highest" to "Lowest"
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
+
+                return fig
+
+            # Call the function to plot the legend and display it in Streamlit
+            legend_fig = plot_color_legend()
+            st.pyplot(legend_fig)            
 
 ######################################################################################################################################
 ######################################################################################################################################
@@ -11036,8 +12017,8 @@ if choose == "Compare Jogadores":
             Lateral_Charts = pd.read_csv('PlayerAnalysis_Role_11.csv')
 
             Lateral_Charts_1 = Lateral_Charts[
-            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe'] == equipe_1)) |
-            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe'] == equipe_2))
+            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_1)) |
+            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_2))
             ]
 
             # Reindex to ensure the correct order
@@ -11160,6 +12141,254 @@ if choose == "Compare Jogadores":
 
 ######################################################################################################################################
 ######################################################################################################################################
+            # Define column metricas
+            metricas = ["Ações Defensivas BemSucedidas", "Duelos Defensivos Ganhos", "Duelos Aéreos Ganhos", 
+                        "Passes Longos Certos", "Passes Frontais Certos", "Passes Progressivos Certos", 
+                        "Ações Ofensivas BemSucedidas", "Duelos Ofensivos Ganhos", "Dribles BemSucedidos", 
+                        "Corridas Progressivas", "Passes TerçoFinal Certos"]
+
+            # #Elaborar Tabela com Métricas do Atleta
+            jogador_1_metrics = pd.read_csv('11_Role_Volante_Equilibrado.csv')
+            jogador_1_percents = pd.read_csv('PlayerAnalysis_Role_11.csv')
+            #Collecting metrics for jogador_1
+            jogador_1_metrics = jogador_1_metrics[
+            ((jogador_1_metrics['Atleta'] == jogador_1) & (jogador_1_metrics['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_metrics = jogador_1_metrics.iloc[:, np.r_[1, 18:29]].reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_1_metrics = jogador_1_metrics.round(decimals=2)
+            jogador_1_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_1
+            jogador_1_percents = jogador_1_percents[
+            ((jogador_1_percents['Atleta'] == jogador_1) & (jogador_1_percents['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_percents = jogador_1_percents.iloc[:, np.r_[13, 60:71]].reset_index(drop=True)
+            jogador_1_percents = jogador_1_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_1_percents = jogador_1_percents.round(decimals=0)
+            jogador_1_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_1 + "_percent"
+            jogador_1_percents.iloc[0, 0] = jogador_1 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_1_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_1_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_1_metrics = pd.concat([jogador_1_metrics, jogador_1_percents])
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_1_metrics.columns = jogador_1_metrics.iloc[0]  # Set the first row as the header
+            jogador_1_metrics = jogador_1_metrics.drop(jogador_1_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics.insert(0, 'Métricas', metricas)
+            
+            
+#################################################################################################################
+
+            # #Elaborar Tabela com Métricas do Jogador_2
+            jogador_2_metrics = pd.read_csv('11_Role_Volante_Equilibrado.csv')
+            jogador_2_percents = pd.read_csv('PlayerAnalysis_Role_11.csv')
+            #Collecting metrics for jogador_2
+            jogador_2_metrics = jogador_2_metrics[
+            ((jogador_2_metrics['Atleta'] == jogador_2) & (jogador_2_metrics['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_metrics = jogador_2_metrics.iloc[:, np.r_[1, 18:29]].reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_2_metrics = jogador_2_metrics.round(decimals=2)
+            jogador_2_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_2
+            jogador_2_percents = jogador_2_percents[
+            ((jogador_2_percents['Atleta'] == jogador_2) & (jogador_2_percents['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_percents = jogador_2_percents.iloc[:, np.r_[13, 60:71]].reset_index(drop=True)
+            jogador_2_percents = jogador_2_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_2_percents = jogador_2_percents.round(decimals=0)
+            jogador_2_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_2 + "_percent"
+            jogador_2_percents.iloc[0, 0] = jogador_2 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_2_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_2_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_2_metrics = pd.concat([jogador_2_metrics, jogador_2_percents])
+            jogador_2_metrics = jogador_2_metrics.reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_2_metrics.columns = jogador_2_metrics.iloc[0]  # Set the first row as the header
+            jogador_2_metrics = jogador_2_metrics.drop(jogador_2_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_2_metrics.insert(0, 'Métricas', metricas)
+            
+
+
+            # Function to apply conditional formatting based on the percentile values
+            def apply_colormap_based_on_value(val):
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 75 <= val < 90:
+                    color = cmap2(0.50)  # "Destaque"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 60 <= val < 75:
+                    color = cmap(0.50)  # "Razoável"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 40 <= val < 60:
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                else:
+                    color = cmap1(0.50)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+            # Function to apply the colormap to a specified column based on the corresponding percentiles column
+            def apply_colormap_to_column_based_on_percentiles(styler, df, values_col, percentiles_col):
+                colormap_styles = [apply_colormap_based_on_value(val) for val in df[percentiles_col]]
+                return styler.apply(lambda _: colormap_styles, subset=[values_col])
+
+            # Function to merge jogador_1_metrics and jogador_2_metrics
+            def merge_metrics_tables(jogador_1_metrics, jogador_2_metrics):
+                # Rename the columns for each player
+                jogador_1_metrics.columns = ['Métricas', jogador_1, 'Player 1 Percentiles']
+                jogador_2_metrics.columns = ['Métricas', jogador_2, 'Player 2 Percentiles']
+
+                # Merge the two DataFrames on the "Métricas" column
+                merged_df = pd.merge(jogador_1_metrics[['Métricas', jogador_1, 'Player 1 Percentiles']],
+                                    jogador_2_metrics[['Métricas', jogador_2, 'Player 2 Percentiles']],
+                                    on='Métricas')
+
+                return merged_df
+
+            # Styling function for merged DataFrame
+            def style_merged_table(merged_df):
+                # Create a Styler object from the merged DataFrame
+                styled_df = merged_df.style
+
+                # Apply colormap to jogador_1 values based on Player 1 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_1, 'Player 1 Percentiles')
+
+                # Apply colormap to jogador_2 values based on Player 2 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_2, 'Player 2 Percentiles')
+                
+                # Format both jogador_1 and jogador_2 columns to display 2 decimal places
+                styled_df = styled_df.format({jogador_1: "{:.2f}", jogador_2: "{:.2f}"})
+                
+                # Left-align column[0] ("Métricas") and center columns[1, 2] ("jogador_1" and "jogador_2")
+                styled_df = styled_df.set_properties(subset=['Métricas'], **{'text-align': 'left'})
+                styled_df = styled_df.set_properties(subset=[jogador_1, jogador_2], **{'text-align': 'center'})
+
+                # Drop both percentile columns from the final display
+                styled_df = styled_df.hide(axis='columns', subset=['Player 1 Percentiles', 'Player 2 Percentiles'])
+
+                # Apply table styles as in the LAST CODE
+                styled_df = styled_df.set_table_styles(
+                    [{
+                        'selector': 'thead th',
+                        'props': [('font-weight', 'bold'),
+                                ('border-style', 'solid'),
+                                ('border-width', '0px 0px 2px 0px'),
+                                ('border-color', 'black')]
+                    }, {
+                        'selector': 'thead th:not(:first-child)',
+                        'props': [('text-align', 'center')]  # Center headers except the first
+                    }, {
+                        'selector': 'thead th:last-child',
+                        'props': [('color', 'black')]  # Make last column header black
+                    }, {
+                        'selector': 'td',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'center')]
+                    }, {
+                        'selector': 'th',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'left')]
+                    }]
+                ).set_properties(**{'padding': '2px', 'font-size': '15px'})
+
+                return styled_df
+
+            # Main function to process the data
+            def main():
+                # Assuming jogador_1_metrics and jogador_2_metrics are already defined with the necessary columns (Métricas, Values, Percentiles)
+
+                # Merge the two tables
+                merged_metrics = merge_metrics_tables(jogador_1_metrics, jogador_2_metrics)
+
+                # Style the merged table
+                styled_merged_metrics = style_merged_table(merged_metrics)
+
+                # Convert to HTML and display (for Streamlit, you'd use st.markdown)
+                merged_html = styled_merged_metrics.to_html(escape=False, index=False)
+                center_html = f"<div style='margin-left: auto; margin-right: auto; width: fit-content;'>{merged_html}</div>"
+
+                # Output the final table (for Streamlit, you'd use st.markdown)
+                st.markdown(center_html, unsafe_allow_html=True)
+
+            if __name__ == '__main__':
+                main()
+
+
+            # Function to plot the legend using the same colors as the apply_colormap_based_on_value function
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+            def plot_color_legend():
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
+                
+                # Labels for the legend (highest to lowest)
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
+                # Plot the legend horizontally with a smaller size
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
+                    ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
+                ax.set_ylim(0, 1)
+                ax.axis('off')  # Remove axes
+
+                # Add an arrow pointing from "Highest" to "Lowest"
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
+
+                return fig
+
+            # Call the function to plot the legend and display it in Streamlit
+            legend_fig = plot_color_legend()
+            st.pyplot(legend_fig)            
+
+######################################################################################################################################
 
         elif (posição_1 == posição_2 == ("Segundo Volante")):
             
@@ -11168,8 +12397,8 @@ if choose == "Compare Jogadores":
             Lateral_Charts = pd.read_csv('PlayerAnalysis_Role_14.csv')
 
             Lateral_Charts_1 = Lateral_Charts[
-            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe'] == equipe_1)) |
-            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe'] == equipe_2))
+            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_1)) |
+            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_2))
             ]
 
             # Reindex to ensure the correct order
@@ -11292,6 +12521,258 @@ if choose == "Compare Jogadores":
 
 
 ######################################################################################################################################
+            # Define column metricas
+            metricas = ['Ações Defensivas BemSucedidas', 'Duelos Defensivos Ganhos', 'Passes Longos Certos', 
+                        'Passes Progressivos Certos', 'Pisadas Área', 'Dribles BemSucedidos', 
+                        'Corridas Progressivas', 'xG', 'xA', 'Assistência Finalização', 'Passes TerçoFinal Certos', 
+                        'Deep Completions', 'Passes ÁreaPênalti Certos']
+
+            # #Elaborar Tabela com Métricas do Atleta
+            jogador_1_metrics = pd.read_csv('14_Role_Segundo_Volante_Equilibrado.csv')
+            jogador_1_percents = pd.read_csv('PlayerAnalysis_Role_14.csv')
+            #Collecting metrics for jogador_1
+            jogador_1_metrics = jogador_1_metrics[
+            ((jogador_1_metrics['Atleta'] == jogador_1) & (jogador_1_metrics['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_metrics = jogador_1_metrics.iloc[:, np.r_[1, 18:31]].reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_1_metrics = jogador_1_metrics.round(decimals=2)
+            jogador_1_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_1
+            jogador_1_percents = jogador_1_percents[
+            ((jogador_1_percents['Atleta'] == jogador_1) & (jogador_1_percents['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_percents = jogador_1_percents.iloc[:, np.r_[15, 66:79]].reset_index(drop=True)
+            jogador_1_percents = jogador_1_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_1_percents = jogador_1_percents.round(decimals=0)
+            jogador_1_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_1 + "_percent"
+            jogador_1_percents.iloc[0, 0] = jogador_1 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_1_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_1_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_1_metrics = pd.concat([jogador_1_metrics, jogador_1_percents])
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_1_metrics.columns = jogador_1_metrics.iloc[0]  # Set the first row as the header
+            jogador_1_metrics = jogador_1_metrics.drop(jogador_1_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics.insert(0, 'Métricas', metricas)
+            
+            
+#################################################################################################################
+
+            # #Elaborar Tabela com Métricas do Jogador_2
+            jogador_2_metrics = pd.read_csv('14_Role_Segundo_Volante_Equilibrado.csv')
+            jogador_2_percents = pd.read_csv('PlayerAnalysis_Role_14.csv')
+            #Collecting metrics for jogador_2
+            jogador_2_metrics = jogador_2_metrics[
+            ((jogador_2_metrics['Atleta'] == jogador_2) & (jogador_2_metrics['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_metrics = jogador_2_metrics.iloc[:, np.r_[1, 18:31]].reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_2_metrics = jogador_2_metrics.round(decimals=2)
+            jogador_2_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_2
+            jogador_2_percents = jogador_2_percents[
+            ((jogador_2_percents['Atleta'] == jogador_2) & (jogador_2_percents['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_percents = jogador_2_percents.iloc[:, np.r_[15, 66:79]].reset_index(drop=True)
+            #jogador_2_percents = jogador_2_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_2_percents = jogador_2_percents.round(decimals=0)
+            jogador_2_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_2 + "_percent"
+            jogador_2_percents.iloc[0, 0] = jogador_2 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_2_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_2_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_2_metrics = pd.concat([jogador_2_metrics, jogador_2_percents])
+            jogador_2_metrics = jogador_2_metrics.reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_2_metrics.columns = jogador_2_metrics.iloc[0]  # Set the first row as the header
+            jogador_2_metrics = jogador_2_metrics.drop(jogador_2_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_2_metrics.insert(0, 'Métricas', metricas)
+            
+
+
+            # Function to apply conditional formatting based on the percentile values
+            def apply_colormap_based_on_value(val):
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 75 <= val < 90:
+                    color = cmap2(0.50)  # "Destaque"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 60 <= val < 75:
+                    color = cmap(0.50)  # "Razoável"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 40 <= val < 60:
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                else:
+                    color = cmap1(0.50)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+            # Function to apply the colormap to a specified column based on the corresponding percentiles column
+            def apply_colormap_to_column_based_on_percentiles(styler, df, values_col, percentiles_col):
+                colormap_styles = [apply_colormap_based_on_value(val) for val in df[percentiles_col]]
+                return styler.apply(lambda _: colormap_styles, subset=[values_col])
+
+            # Function to merge jogador_1_metrics and jogador_2_metrics
+            def merge_metrics_tables(jogador_1_metrics, jogador_2_metrics):
+                # Rename the columns for each player
+                jogador_1_metrics.columns = ['Métricas', jogador_1, 'Player 1 Percentiles']
+                jogador_2_metrics.columns = ['Métricas', jogador_2, 'Player 2 Percentiles']
+
+                # Merge the two DataFrames on the "Métricas" column
+                merged_df = pd.merge(jogador_1_metrics[['Métricas', jogador_1, 'Player 1 Percentiles']],
+                                    jogador_2_metrics[['Métricas', jogador_2, 'Player 2 Percentiles']],
+                                    on='Métricas')
+
+                return merged_df
+
+            # Styling function for merged DataFrame
+            def style_merged_table(merged_df):
+                # Create a Styler object from the merged DataFrame
+                styled_df = merged_df.style
+
+                # Apply colormap to jogador_1 values based on Player 1 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_1, 'Player 1 Percentiles')
+
+                # Apply colormap to jogador_2 values based on Player 2 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_2, 'Player 2 Percentiles')
+                
+                # Format both jogador_1 and jogador_2 columns to display 2 decimal places
+                styled_df = styled_df.format({jogador_1: "{:.2f}", jogador_2: "{:.2f}"})
+                
+                # Left-align column[0] ("Métricas") and center columns[1, 2] ("jogador_1" and "jogador_2")
+                styled_df = styled_df.set_properties(subset=['Métricas'], **{'text-align': 'left'})
+                styled_df = styled_df.set_properties(subset=[jogador_1, jogador_2], **{'text-align': 'center'})
+
+                # Drop both percentile columns from the final display
+                styled_df = styled_df.hide(axis='columns', subset=['Player 1 Percentiles', 'Player 2 Percentiles'])
+
+                # Apply table styles as in the LAST CODE
+                styled_df = styled_df.set_table_styles(
+                    [{
+                        'selector': 'thead th',
+                        'props': [('font-weight', 'bold'),
+                                ('border-style', 'solid'),
+                                ('border-width', '0px 0px 2px 0px'),
+                                ('border-color', 'black')]
+                    }, {
+                        'selector': 'thead th:not(:first-child)',
+                        'props': [('text-align', 'center')]  # Center headers except the first
+                    }, {
+                        'selector': 'thead th:last-child',
+                        'props': [('color', 'black')]  # Make last column header black
+                    }, {
+                        'selector': 'td',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'center')]
+                    }, {
+                        'selector': 'th',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'left')]
+                    }]
+                ).set_properties(**{'padding': '2px', 'font-size': '15px'})
+
+                return styled_df
+
+            # Main function to process the data
+            def main():
+                # Assuming jogador_1_metrics and jogador_2_metrics are already defined with the necessary columns (Métricas, Values, Percentiles)
+
+                # Merge the two tables
+                merged_metrics = merge_metrics_tables(jogador_1_metrics, jogador_2_metrics)
+
+                # Style the merged table
+                styled_merged_metrics = style_merged_table(merged_metrics)
+
+                # Convert to HTML and display (for Streamlit, you'd use st.markdown)
+                merged_html = styled_merged_metrics.to_html(escape=False, index=False)
+                center_html = f"<div style='margin-left: auto; margin-right: auto; width: fit-content;'>{merged_html}</div>"
+
+                # Output the final table (for Streamlit, you'd use st.markdown)
+                st.markdown(center_html, unsafe_allow_html=True)
+
+            if __name__ == '__main__':
+                main()
+
+
+            # Function to plot the legend using the same colors as the apply_colormap_based_on_value function
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
+            def plot_color_legend():
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
+                
+                # Labels for the legend (highest to lowest)
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
+                # Plot the legend horizontally with a smaller size
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
+                    ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
+                ax.set_ylim(0, 1)
+                ax.axis('off')  # Remove axes
+
+                # Add an arrow pointing from "Highest" to "Lowest"
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
+
+                return fig
+
+            # Call the function to plot the legend and display it in Streamlit
+            legend_fig = plot_color_legend()
+            st.pyplot(legend_fig)            
+
+
+
+
+######################################################################################################################################
 ######################################################################################################################################
 
         elif (posição_1 == posição_2 == ("Meia")):
@@ -11301,8 +12782,8 @@ if choose == "Compare Jogadores":
             Lateral_Charts = pd.read_csv('PlayerAnalysis_Role_15.csv')
 
             Lateral_Charts_1 = Lateral_Charts[
-            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe'] == equipe_1)) |
-            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe'] == equipe_2))
+            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_1)) |
+            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_2))
             ]
 
             # Reindex to ensure the correct order
@@ -11371,14 +12852,262 @@ if choose == "Compare Jogadores":
             st.pyplot(fig)
             
 ######################################################################################################################################
+            # Define column metricas
+            metricas = ['Passes Longos Certos', 'Passes Frontais Certos', 'Passes Progressivos Certos', 
+                        'Duelos Ofensivos Ganhos', 'Dribles BemSucedidos', 'xA', 'Assistência Finalização', 
+                        'Passes TerçoFinal Certos', 'Passes EntreLinhas Certos', 'Passes Chave']
+
+            # #Elaborar Tabela com Métricas do Atleta
+            jogador_1_metrics = pd.read_csv('15_Role_Meia_Organizador.csv')
+            jogador_1_percents = pd.read_csv('PlayerAnalysis_Role_15.csv')
+            #Collecting metrics for jogador_1
+            jogador_1_metrics = jogador_1_metrics[
+            ((jogador_1_metrics['Atleta'] == jogador_1) & (jogador_1_metrics['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_metrics = jogador_1_metrics.iloc[:, np.r_[1, 18:28]].reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_1_metrics = jogador_1_metrics.round(decimals=2)
+            jogador_1_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_1
+            jogador_1_percents = jogador_1_percents[
+            ((jogador_1_percents['Atleta'] == jogador_1) & (jogador_1_percents['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_percents = jogador_1_percents.iloc[:, np.r_[12, 57:67]].reset_index(drop=True)
+            jogador_1_percents = jogador_1_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_1_percents = jogador_1_percents.round(decimals=0)
+            jogador_1_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_1 + "_percent"
+            jogador_1_percents.iloc[0, 0] = jogador_1 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_1_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_1_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_1_metrics = pd.concat([jogador_1_metrics, jogador_1_percents])
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_1_metrics.columns = jogador_1_metrics.iloc[0]  # Set the first row as the header
+            jogador_1_metrics = jogador_1_metrics.drop(jogador_1_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics.insert(0, 'Métricas', metricas)
+            
+            
+#################################################################################################################
+
+            # #Elaborar Tabela com Métricas do Jogador_2
+            jogador_2_metrics = pd.read_csv('15_Role_Meia_Organizador.csv')
+            jogador_2_percents = pd.read_csv('PlayerAnalysis_Role_15.csv')
+            #Collecting metrics for jogador_2
+            jogador_2_metrics = jogador_2_metrics[
+            ((jogador_2_metrics['Atleta'] == jogador_2) & (jogador_2_metrics['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_metrics = jogador_2_metrics.iloc[:, np.r_[1, 18:28]].reset_index(drop=True)
+            #jogador_2_metrics = jogador_2_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_2_metrics = jogador_2_metrics.round(decimals=2)
+            jogador_2_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_2
+            jogador_2_percents = jogador_2_percents[
+            ((jogador_2_percents['Atleta'] == jogador_2) & (jogador_2_percents['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_percents = jogador_2_percents.iloc[:, np.r_[12, 57:67]].reset_index(drop=True)
+            #jogador_2_percents = jogador_2_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_2_percents = jogador_2_percents.round(decimals=0)
+            jogador_2_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_2 + "_percent"
+            jogador_2_percents.iloc[0, 0] = jogador_2 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_2_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_2_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_2_metrics = pd.concat([jogador_2_metrics, jogador_2_percents])
+            jogador_2_metrics = jogador_2_metrics.reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_2_metrics.columns = jogador_2_metrics.iloc[0]  # Set the first row as the header
+            jogador_2_metrics = jogador_2_metrics.drop(jogador_2_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_2_metrics.insert(0, 'Métricas', metricas)
+            
+
+
+            # Function to apply conditional formatting based on the percentile values
+            def apply_colormap_based_on_value(val):
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 75 <= val < 90:
+                    color = cmap2(0.50)  # "Destaque"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 60 <= val < 75:
+                    color = cmap(0.50)  # "Razoável"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 40 <= val < 60:
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                else:
+                    color = cmap1(0.50)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+            # Function to apply the colormap to a specified column based on the corresponding percentiles column
+            def apply_colormap_to_column_based_on_percentiles(styler, df, values_col, percentiles_col):
+                colormap_styles = [apply_colormap_based_on_value(val) for val in df[percentiles_col]]
+                return styler.apply(lambda _: colormap_styles, subset=[values_col])
+
+            # Function to merge jogador_1_metrics and jogador_2_metrics
+            def merge_metrics_tables(jogador_1_metrics, jogador_2_metrics):
+                # Rename the columns for each player
+                jogador_1_metrics.columns = ['Métricas', jogador_1, 'Player 1 Percentiles']
+                jogador_2_metrics.columns = ['Métricas', jogador_2, 'Player 2 Percentiles']
+
+                # Merge the two DataFrames on the "Métricas" column
+                merged_df = pd.merge(jogador_1_metrics[['Métricas', jogador_1, 'Player 1 Percentiles']],
+                                    jogador_2_metrics[['Métricas', jogador_2, 'Player 2 Percentiles']],
+                                    on='Métricas')
+
+                return merged_df
+
+            # Styling function for merged DataFrame
+            def style_merged_table(merged_df):
+                # Create a Styler object from the merged DataFrame
+                styled_df = merged_df.style
+
+                # Apply colormap to jogador_1 values based on Player 1 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_1, 'Player 1 Percentiles')
+
+                # Apply colormap to jogador_2 values based on Player 2 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_2, 'Player 2 Percentiles')
+                
+                # Format both jogador_1 and jogador_2 columns to display 2 decimal places
+                styled_df = styled_df.format({jogador_1: "{:.2f}", jogador_2: "{:.2f}"})
+                
+                # Left-align column[0] ("Métricas") and center columns[1, 2] ("jogador_1" and "jogador_2")
+                styled_df = styled_df.set_properties(subset=['Métricas'], **{'text-align': 'left'})
+                styled_df = styled_df.set_properties(subset=[jogador_1, jogador_2], **{'text-align': 'center'})
+
+                # Drop both percentile columns from the final display
+                styled_df = styled_df.hide(axis='columns', subset=['Player 1 Percentiles', 'Player 2 Percentiles'])
+
+                # Apply table styles as in the LAST CODE
+                styled_df = styled_df.set_table_styles(
+                    [{
+                        'selector': 'thead th',
+                        'props': [('font-weight', 'bold'),
+                                ('border-style', 'solid'),
+                                ('border-width', '0px 0px 2px 0px'),
+                                ('border-color', 'black')]
+                    }, {
+                        'selector': 'thead th:not(:first-child)',
+                        'props': [('text-align', 'center')]  # Center headers except the first
+                    }, {
+                        'selector': 'thead th:last-child',
+                        'props': [('color', 'black')]  # Make last column header black
+                    }, {
+                        'selector': 'td',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'center')]
+                    }, {
+                        'selector': 'th',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'left')]
+                    }]
+                ).set_properties(**{'padding': '2px', 'font-size': '15px'})
+
+                return styled_df
+
+            # Main function to process the data
+            def main():
+                # Assuming jogador_1_metrics and jogador_2_metrics are already defined with the necessary columns (Métricas, Values, Percentiles)
+
+                # Merge the two tables
+                merged_metrics = merge_metrics_tables(jogador_1_metrics, jogador_2_metrics)
+
+                # Style the merged table
+                styled_merged_metrics = style_merged_table(merged_metrics)
+
+                # Convert to HTML and display (for Streamlit, you'd use st.markdown)
+                merged_html = styled_merged_metrics.to_html(escape=False, index=False)
+                center_html = f"<div style='margin-left: auto; margin-right: auto; width: fit-content;'>{merged_html}</div>"
+
+                # Output the final table (for Streamlit, you'd use st.markdown)
+                st.markdown(center_html, unsafe_allow_html=True)
+
+            if __name__ == '__main__':
+                main()
+
+
+            # Function to plot the legend using the same colors as the apply_colormap_based_on_value function
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
+            def plot_color_legend():
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
+                
+                # Labels for the legend (highest to lowest)
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
+                # Plot the legend horizontally with a smaller size
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
+                    ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
+                ax.set_ylim(0, 1)
+                ax.axis('off')  # Remove axes
+
+                # Add an arrow pointing from "Highest" to "Lowest"
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
+
+                return fig
+
+            # Call the function to plot the legend and display it in Streamlit
+            legend_fig = plot_color_legend()
+            st.pyplot(legend_fig)            
+
+######################################################################################################################################
 
             #Plotar Primeiro Gráfico - Radar de Percentis do Jogador na liga:
             st.markdown("<h3 style='text-align: center; color: blue; '>Comparação do Desempenho dos Jogadores em 2024<br><br>Perfil: Meia Atacante</h3>", unsafe_allow_html=True)
             Lateral_Charts = pd.read_csv('PlayerAnalysis_Role_16.csv')
 
             Lateral_Charts_1 = Lateral_Charts[
-            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe'] == equipe_1)) |
-            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe'] == equipe_2))
+            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_1)) |
+            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_2))
             ]
 
             # Reindex to ensure the correct order
@@ -11499,6 +13228,256 @@ if choose == "Compare Jogadores":
             )
             st.pyplot(fig)
 
+######################################################################################################################################
+            # Define column metricas
+            metricas = ['Passes Longos Certos', 'Passes Frontais Certos', 'Passes Progressivos Certos', 
+                        'Duelos Ofensivos Ganhos', 'Pisadas Área', 'Dribles BemSucedidos', 'xG', 
+                        'Finalizações NoAlvo', 'Ameaça Ofensiva', 'xA', 'Assistência Finalização', 
+                        'Passes TerçoFinal Certos', 'Passes Inteligentes Certos', 'Passes EntreLinhas Certos', 
+                        'Deep Completions', 'Passes Chave', 'Passes ÁreaPênalti Certos']
+
+            # #Elaborar Tabela com Métricas do Atleta
+            jogador_1_metrics = pd.read_csv('16_Role_Meia_Atacante.csv')
+            jogador_1_percents = pd.read_csv('PlayerAnalysis_Role_16.csv')
+            #Collecting metrics for jogador_1
+            jogador_1_metrics = jogador_1_metrics[
+            ((jogador_1_metrics['Atleta'] == jogador_1) & (jogador_1_metrics['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_metrics = jogador_1_metrics.iloc[:, np.r_[1, 18:35]].reset_index(drop=True)
+            #jogador_1_metrics = jogador_1_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_1_metrics = jogador_1_metrics.round(decimals=2)
+            jogador_1_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_1
+            jogador_1_percents = jogador_1_percents[
+            ((jogador_1_percents['Atleta'] == jogador_1) & (jogador_1_percents['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_percents = jogador_1_percents.iloc[:, np.r_[19, 78:95]].reset_index(drop=True)
+            #jogador_1_percents = jogador_1_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_1_percents = jogador_1_percents.round(decimals=0)
+            jogador_1_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_1 + "_percent"
+            jogador_1_percents.iloc[0, 0] = jogador_1 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_1_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_1_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_1_metrics = pd.concat([jogador_1_metrics, jogador_1_percents])
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_1_metrics.columns = jogador_1_metrics.iloc[0]  # Set the first row as the header
+            jogador_1_metrics = jogador_1_metrics.drop(jogador_1_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics.insert(0, 'Métricas', metricas)
+            
+            
+#################################################################################################################
+
+            # #Elaborar Tabela com Métricas do Jogador_2
+            jogador_2_metrics = pd.read_csv('16_Role_Meia_Atacante.csv')
+            jogador_2_percents = pd.read_csv('PlayerAnalysis_Role_16.csv')
+            #Collecting metrics for jogador_2
+            jogador_2_metrics = jogador_2_metrics[
+            ((jogador_2_metrics['Atleta'] == jogador_2) & (jogador_2_metrics['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_metrics = jogador_2_metrics.iloc[:, np.r_[1, 18:35]].reset_index(drop=True)
+            #jogador_2_metrics = jogador_2_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_2_metrics = jogador_2_metrics.round(decimals=2)
+            jogador_2_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_2
+            jogador_2_percents = jogador_2_percents[
+            ((jogador_2_percents['Atleta'] == jogador_2) & (jogador_2_percents['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_percents = jogador_2_percents.iloc[:, np.r_[19, 78:95]].reset_index(drop=True)
+            #jogador_2_percents = jogador_2_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_2_percents = jogador_2_percents.round(decimals=0)
+            jogador_2_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_2 + "_percent"
+            jogador_2_percents.iloc[0, 0] = jogador_2 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_2_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_2_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_2_metrics = pd.concat([jogador_2_metrics, jogador_2_percents])
+            jogador_2_metrics = jogador_2_metrics.reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_2_metrics.columns = jogador_2_metrics.iloc[0]  # Set the first row as the header
+            jogador_2_metrics = jogador_2_metrics.drop(jogador_2_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_2_metrics.insert(0, 'Métricas', metricas)
+            
+
+
+            # Function to apply conditional formatting based on the percentile values
+            def apply_colormap_based_on_value(val):
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 75 <= val < 90:
+                    color = cmap2(0.50)  # "Destaque"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 60 <= val < 75:
+                    color = cmap(0.50)  # "Razoável"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 40 <= val < 60:
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                else:
+                    color = cmap1(0.50)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+            # Function to apply the colormap to a specified column based on the corresponding percentiles column
+            def apply_colormap_to_column_based_on_percentiles(styler, df, values_col, percentiles_col):
+                colormap_styles = [apply_colormap_based_on_value(val) for val in df[percentiles_col]]
+                return styler.apply(lambda _: colormap_styles, subset=[values_col])
+
+            # Function to merge jogador_1_metrics and jogador_2_metrics
+            def merge_metrics_tables(jogador_1_metrics, jogador_2_metrics):
+                # Rename the columns for each player
+                jogador_1_metrics.columns = ['Métricas', jogador_1, 'Player 1 Percentiles']
+                jogador_2_metrics.columns = ['Métricas', jogador_2, 'Player 2 Percentiles']
+
+                # Merge the two DataFrames on the "Métricas" column
+                merged_df = pd.merge(jogador_1_metrics[['Métricas', jogador_1, 'Player 1 Percentiles']],
+                                    jogador_2_metrics[['Métricas', jogador_2, 'Player 2 Percentiles']],
+                                    on='Métricas')
+
+                return merged_df
+
+            # Styling function for merged DataFrame
+            def style_merged_table(merged_df):
+                # Create a Styler object from the merged DataFrame
+                styled_df = merged_df.style
+
+                # Apply colormap to jogador_1 values based on Player 1 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_1, 'Player 1 Percentiles')
+
+                # Apply colormap to jogador_2 values based on Player 2 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_2, 'Player 2 Percentiles')
+                
+                # Format both jogador_1 and jogador_2 columns to display 2 decimal places
+                styled_df = styled_df.format({jogador_1: "{:.2f}", jogador_2: "{:.2f}"})
+                
+                # Left-align column[0] ("Métricas") and center columns[1, 2] ("jogador_1" and "jogador_2")
+                styled_df = styled_df.set_properties(subset=['Métricas'], **{'text-align': 'left'})
+                styled_df = styled_df.set_properties(subset=[jogador_1, jogador_2], **{'text-align': 'center'})
+
+                # Drop both percentile columns from the final display
+                styled_df = styled_df.hide(axis='columns', subset=['Player 1 Percentiles', 'Player 2 Percentiles'])
+
+                # Apply table styles as in the LAST CODE
+                styled_df = styled_df.set_table_styles(
+                    [{
+                        'selector': 'thead th',
+                        'props': [('font-weight', 'bold'),
+                                ('border-style', 'solid'),
+                                ('border-width', '0px 0px 2px 0px'),
+                                ('border-color', 'black')]
+                    }, {
+                        'selector': 'thead th:not(:first-child)',
+                        'props': [('text-align', 'center')]  # Center headers except the first
+                    }, {
+                        'selector': 'thead th:last-child',
+                        'props': [('color', 'black')]  # Make last column header black
+                    }, {
+                        'selector': 'td',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'center')]
+                    }, {
+                        'selector': 'th',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'left')]
+                    }]
+                ).set_properties(**{'padding': '2px', 'font-size': '15px'})
+
+                return styled_df
+
+            # Main function to process the data
+            def main():
+                # Assuming jogador_1_metrics and jogador_2_metrics are already defined with the necessary columns (Métricas, Values, Percentiles)
+
+                # Merge the two tables
+                merged_metrics = merge_metrics_tables(jogador_1_metrics, jogador_2_metrics)
+
+                # Style the merged table
+                styled_merged_metrics = style_merged_table(merged_metrics)
+
+                # Convert to HTML and display (for Streamlit, you'd use st.markdown)
+                merged_html = styled_merged_metrics.to_html(escape=False, index=False)
+                center_html = f"<div style='margin-left: auto; margin-right: auto; width: fit-content;'>{merged_html}</div>"
+
+                # Output the final table (for Streamlit, you'd use st.markdown)
+                st.markdown(center_html, unsafe_allow_html=True)
+
+            if __name__ == '__main__':
+                main()
+
+
+            # Function to plot the legend using the same colors as the apply_colormap_based_on_value function
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
+            def plot_color_legend():
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
+                
+                # Labels for the legend (highest to lowest)
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
+                # Plot the legend horizontally with a smaller size
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
+                    ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
+                ax.set_ylim(0, 1)
+                ax.axis('off')  # Remove axes
+
+                # Add an arrow pointing from "Highest" to "Lowest"
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
+
+                return fig
+
+            # Call the function to plot the legend and display it in Streamlit
+            legend_fig = plot_color_legend()
+            st.pyplot(legend_fig)            
+
 
 ######################################################################################################################################
 ######################################################################################################################################
@@ -11510,8 +13489,8 @@ if choose == "Compare Jogadores":
             Lateral_Charts = pd.read_csv('PlayerAnalysis_Role_17.csv')
 
             Lateral_Charts_1 = Lateral_Charts[
-            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe'] == equipe_1)) |
-            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe'] == equipe_2))
+            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_1)) |
+            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_2))
             ]
 
             # Reindex to ensure the correct order
@@ -11632,6 +13611,254 @@ if choose == "Compare Jogadores":
             )
             st.pyplot(fig)
 
+######################################################################################################################################
+            # Define column metricas
+            metricas = ['Passes Longos Certos', 'Passes Frontais Certos', 'Passes Progressivos Certos', 
+                        'Duelos Ofensivos Ganhos', 'Dribles BemSucedidos', 'xG', 'Finalizações NoAlvo', 
+                        'Conversão Gols', 'xA', 'Assistência Finalização', 'Passes Inteligentes Certos', 
+                        'Passes EntreLinhas Certos', 'Passes Chave']
+
+            # #Elaborar Tabela com Métricas do Atleta
+            jogador_1_metrics = pd.read_csv('17_Role_Extremo_Organizador.csv')
+            jogador_1_percents = pd.read_csv('PlayerAnalysis_Role_17.csv')
+            #Collecting metrics for jogador_1
+            jogador_1_metrics = jogador_1_metrics[
+            ((jogador_1_metrics['Atleta'] == jogador_1) & (jogador_1_metrics['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_metrics = jogador_1_metrics.iloc[:, np.r_[1, 18:31]].reset_index(drop=True)
+            #jogador_1_metrics = jogador_1_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_1_metrics = jogador_1_metrics.round(decimals=2)
+            jogador_1_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_1
+            jogador_1_percents = jogador_1_percents[
+            ((jogador_1_percents['Atleta'] == jogador_1) & (jogador_1_percents['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_percents = jogador_1_percents.iloc[:, np.r_[15, 66:79]].reset_index(drop=True)
+            #jogador_1_percents = jogador_1_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_1_percents = jogador_1_percents.round(decimals=0)
+            jogador_1_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_1 + "_percent"
+            jogador_1_percents.iloc[0, 0] = jogador_1 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_1_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_1_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_1_metrics = pd.concat([jogador_1_metrics, jogador_1_percents])
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_1_metrics.columns = jogador_1_metrics.iloc[0]  # Set the first row as the header
+            jogador_1_metrics = jogador_1_metrics.drop(jogador_1_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics.insert(0, 'Métricas', metricas)
+            
+            
+#################################################################################################################
+
+            # #Elaborar Tabela com Métricas do Jogador_2
+            jogador_2_metrics = pd.read_csv('17_Role_Extremo_Organizador.csv')
+            jogador_2_percents = pd.read_csv('PlayerAnalysis_Role_17.csv')
+            #Collecting metrics for jogador_2
+            jogador_2_metrics = jogador_2_metrics[
+            ((jogador_2_metrics['Atleta'] == jogador_2) & (jogador_2_metrics['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_metrics = jogador_2_metrics.iloc[:, np.r_[1, 18:31]].reset_index(drop=True)
+            #jogador_2_metrics = jogador_2_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_2_metrics = jogador_2_metrics.round(decimals=2)
+            jogador_2_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_2
+            jogador_2_percents = jogador_2_percents[
+            ((jogador_2_percents['Atleta'] == jogador_2) & (jogador_2_percents['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_percents = jogador_2_percents.iloc[:, np.r_[15, 66:79]].reset_index(drop=True)
+            #jogador_2_percents = jogador_2_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_2_percents = jogador_2_percents.round(decimals=0)
+            jogador_2_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_2 + "_percent"
+            jogador_2_percents.iloc[0, 0] = jogador_2 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_2_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_2_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_2_metrics = pd.concat([jogador_2_metrics, jogador_2_percents])
+            jogador_2_metrics = jogador_2_metrics.reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_2_metrics.columns = jogador_2_metrics.iloc[0]  # Set the first row as the header
+            jogador_2_metrics = jogador_2_metrics.drop(jogador_2_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_2_metrics.insert(0, 'Métricas', metricas)
+            
+
+
+            # Function to apply conditional formatting based on the percentile values
+            def apply_colormap_based_on_value(val):
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 75 <= val < 90:
+                    color = cmap2(0.50)  # "Destaque"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 60 <= val < 75:
+                    color = cmap(0.50)  # "Razoável"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 40 <= val < 60:
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                else:
+                    color = cmap1(0.50)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+            # Function to apply the colormap to a specified column based on the corresponding percentiles column
+            def apply_colormap_to_column_based_on_percentiles(styler, df, values_col, percentiles_col):
+                colormap_styles = [apply_colormap_based_on_value(val) for val in df[percentiles_col]]
+                return styler.apply(lambda _: colormap_styles, subset=[values_col])
+
+            # Function to merge jogador_1_metrics and jogador_2_metrics
+            def merge_metrics_tables(jogador_1_metrics, jogador_2_metrics):
+                # Rename the columns for each player
+                jogador_1_metrics.columns = ['Métricas', jogador_1, 'Player 1 Percentiles']
+                jogador_2_metrics.columns = ['Métricas', jogador_2, 'Player 2 Percentiles']
+
+                # Merge the two DataFrames on the "Métricas" column
+                merged_df = pd.merge(jogador_1_metrics[['Métricas', jogador_1, 'Player 1 Percentiles']],
+                                    jogador_2_metrics[['Métricas', jogador_2, 'Player 2 Percentiles']],
+                                    on='Métricas')
+
+                return merged_df
+
+            # Styling function for merged DataFrame
+            def style_merged_table(merged_df):
+                # Create a Styler object from the merged DataFrame
+                styled_df = merged_df.style
+
+                # Apply colormap to jogador_1 values based on Player 1 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_1, 'Player 1 Percentiles')
+
+                # Apply colormap to jogador_2 values based on Player 2 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_2, 'Player 2 Percentiles')
+                
+                # Format both jogador_1 and jogador_2 columns to display 2 decimal places
+                styled_df = styled_df.format({jogador_1: "{:.2f}", jogador_2: "{:.2f}"})
+                
+                # Left-align column[0] ("Métricas") and center columns[1, 2] ("jogador_1" and "jogador_2")
+                styled_df = styled_df.set_properties(subset=['Métricas'], **{'text-align': 'left'})
+                styled_df = styled_df.set_properties(subset=[jogador_1, jogador_2], **{'text-align': 'center'})
+
+                # Drop both percentile columns from the final display
+                styled_df = styled_df.hide(axis='columns', subset=['Player 1 Percentiles', 'Player 2 Percentiles'])
+
+                # Apply table styles as in the LAST CODE
+                styled_df = styled_df.set_table_styles(
+                    [{
+                        'selector': 'thead th',
+                        'props': [('font-weight', 'bold'),
+                                ('border-style', 'solid'),
+                                ('border-width', '0px 0px 2px 0px'),
+                                ('border-color', 'black')]
+                    }, {
+                        'selector': 'thead th:not(:first-child)',
+                        'props': [('text-align', 'center')]  # Center headers except the first
+                    }, {
+                        'selector': 'thead th:last-child',
+                        'props': [('color', 'black')]  # Make last column header black
+                    }, {
+                        'selector': 'td',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'center')]
+                    }, {
+                        'selector': 'th',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'left')]
+                    }]
+                ).set_properties(**{'padding': '2px', 'font-size': '15px'})
+
+                return styled_df
+
+            # Main function to process the data
+            def main():
+                # Assuming jogador_1_metrics and jogador_2_metrics are already defined with the necessary columns (Métricas, Values, Percentiles)
+
+                # Merge the two tables
+                merged_metrics = merge_metrics_tables(jogador_1_metrics, jogador_2_metrics)
+
+                # Style the merged table
+                styled_merged_metrics = style_merged_table(merged_metrics)
+
+                # Convert to HTML and display (for Streamlit, you'd use st.markdown)
+                merged_html = styled_merged_metrics.to_html(escape=False, index=False)
+                center_html = f"<div style='margin-left: auto; margin-right: auto; width: fit-content;'>{merged_html}</div>"
+
+                # Output the final table (for Streamlit, you'd use st.markdown)
+                st.markdown(center_html, unsafe_allow_html=True)
+
+            if __name__ == '__main__':
+                main()
+
+
+            # Function to plot the legend using the same colors as the apply_colormap_based_on_value function
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
+            def plot_color_legend():
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
+                
+                # Labels for the legend (highest to lowest)
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
+                # Plot the legend horizontally with a smaller size
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
+                    ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
+                ax.set_ylim(0, 1)
+                ax.axis('off')  # Remove axes
+
+                # Add an arrow pointing from "Highest" to "Lowest"
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
+
+                return fig
+
+            # Call the function to plot the legend and display it in Streamlit
+            legend_fig = plot_color_legend()
+            st.pyplot(legend_fig)            
 
 ######################################################################################################################################
 
@@ -11640,8 +13867,8 @@ if choose == "Compare Jogadores":
             Lateral_Charts = pd.read_csv('PlayerAnalysis_Role_18.csv')
 
             Lateral_Charts_1 = Lateral_Charts[
-            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe'] == equipe_1)) |
-            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe'] == equipe_2))
+            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_1)) |
+            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_2))
             ]
 
             # Reindex to ensure the correct order
@@ -11710,14 +13937,262 @@ if choose == "Compare Jogadores":
             st.pyplot(fig)
 
 ######################################################################################################################################
+            # Define column metricas
+            metricas = ['Ações Defensivas BemSucedidas', 'Duelos Defensivos Ganhos', 'Passes Frontais Certos', 
+                        'Passes Progressivos Certos', 'Duelos Ofensivos Ganhos', 'xG', 'xA']
+
+            # #Elaborar Tabela com Métricas do Atleta
+            jogador_1_metrics = pd.read_csv('18_Role_Extremo_Tático.csv')
+            jogador_1_percents = pd.read_csv('PlayerAnalysis_Role_18.csv')
+            #Collecting metrics for jogador_1
+            jogador_1_metrics = jogador_1_metrics[
+            ((jogador_1_metrics['Atleta'] == jogador_1) & (jogador_1_metrics['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_metrics = jogador_1_metrics.iloc[:, np.r_[1, 18:25]].reset_index(drop=True)
+            #jogador_1_metrics = jogador_1_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_1_metrics = jogador_1_metrics.round(decimals=2)
+            jogador_1_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_1
+            jogador_1_percents = jogador_1_percents[
+            ((jogador_1_percents['Atleta'] == jogador_1) & (jogador_1_percents['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_percents = jogador_1_percents.iloc[:, np.r_[9, 48:55]].reset_index(drop=True)
+            #jogador_1_percents = jogador_1_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_1_percents = jogador_1_percents.round(decimals=0)
+            jogador_1_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_1 + "_percent"
+            jogador_1_percents.iloc[0, 0] = jogador_1 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_1_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_1_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_1_metrics = pd.concat([jogador_1_metrics, jogador_1_percents])
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_1_metrics.columns = jogador_1_metrics.iloc[0]  # Set the first row as the header
+            jogador_1_metrics = jogador_1_metrics.drop(jogador_1_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics.insert(0, 'Métricas', metricas)
+            
+            
+#################################################################################################################
+
+            # #Elaborar Tabela com Métricas do Jogador_2
+            jogador_2_metrics = pd.read_csv('18_Role_Extremo_Tático.csv')
+            jogador_2_percents = pd.read_csv('PlayerAnalysis_Role_18.csv')
+            #Collecting metrics for jogador_2
+            jogador_2_metrics = jogador_2_metrics[
+            ((jogador_2_metrics['Atleta'] == jogador_2) & (jogador_2_metrics['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_metrics = jogador_2_metrics.iloc[:, np.r_[1, 18:25]].reset_index(drop=True)
+            #jogador_2_metrics = jogador_2_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_2_metrics = jogador_2_metrics.round(decimals=2)
+            jogador_2_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_2
+            jogador_2_percents = jogador_2_percents[
+            ((jogador_2_percents['Atleta'] == jogador_2) & (jogador_2_percents['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_percents = jogador_2_percents.iloc[:, np.r_[9, 48:55]].reset_index(drop=True)
+            #jogador_2_percents = jogador_2_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_2_percents = jogador_2_percents.round(decimals=0)
+            jogador_2_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_2 + "_percent"
+            jogador_2_percents.iloc[0, 0] = jogador_2 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_2_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_2_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_2_metrics = pd.concat([jogador_2_metrics, jogador_2_percents])
+            jogador_2_metrics = jogador_2_metrics.reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_2_metrics.columns = jogador_2_metrics.iloc[0]  # Set the first row as the header
+            jogador_2_metrics = jogador_2_metrics.drop(jogador_2_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_2_metrics.insert(0, 'Métricas', metricas)
+            
+
+
+            # Function to apply conditional formatting based on the percentile values
+            def apply_colormap_based_on_value(val):
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 75 <= val < 90:
+                    color = cmap2(0.50)  # "Destaque"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 60 <= val < 75:
+                    color = cmap(0.50)  # "Razoável"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 40 <= val < 60:
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                else:
+                    color = cmap1(0.50)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+            # Function to apply the colormap to a specified column based on the corresponding percentiles column
+            def apply_colormap_to_column_based_on_percentiles(styler, df, values_col, percentiles_col):
+                colormap_styles = [apply_colormap_based_on_value(val) for val in df[percentiles_col]]
+                return styler.apply(lambda _: colormap_styles, subset=[values_col])
+
+            # Function to merge jogador_1_metrics and jogador_2_metrics
+            def merge_metrics_tables(jogador_1_metrics, jogador_2_metrics):
+                # Rename the columns for each player
+                jogador_1_metrics.columns = ['Métricas', jogador_1, 'Player 1 Percentiles']
+                jogador_2_metrics.columns = ['Métricas', jogador_2, 'Player 2 Percentiles']
+
+                # Merge the two DataFrames on the "Métricas" column
+                merged_df = pd.merge(jogador_1_metrics[['Métricas', jogador_1, 'Player 1 Percentiles']],
+                                    jogador_2_metrics[['Métricas', jogador_2, 'Player 2 Percentiles']],
+                                    on='Métricas')
+
+                return merged_df
+
+            # Styling function for merged DataFrame
+            def style_merged_table(merged_df):
+                # Create a Styler object from the merged DataFrame
+                styled_df = merged_df.style
+
+                # Apply colormap to jogador_1 values based on Player 1 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_1, 'Player 1 Percentiles')
+
+                # Apply colormap to jogador_2 values based on Player 2 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_2, 'Player 2 Percentiles')
+                
+                # Format both jogador_1 and jogador_2 columns to display 2 decimal places
+                styled_df = styled_df.format({jogador_1: "{:.2f}", jogador_2: "{:.2f}"})
+                
+                # Left-align column[0] ("Métricas") and center columns[1, 2] ("jogador_1" and "jogador_2")
+                styled_df = styled_df.set_properties(subset=['Métricas'], **{'text-align': 'left'})
+                styled_df = styled_df.set_properties(subset=[jogador_1, jogador_2], **{'text-align': 'center'})
+
+                # Drop both percentile columns from the final display
+                styled_df = styled_df.hide(axis='columns', subset=['Player 1 Percentiles', 'Player 2 Percentiles'])
+
+                # Apply table styles as in the LAST CODE
+                styled_df = styled_df.set_table_styles(
+                    [{
+                        'selector': 'thead th',
+                        'props': [('font-weight', 'bold'),
+                                ('border-style', 'solid'),
+                                ('border-width', '0px 0px 2px 0px'),
+                                ('border-color', 'black')]
+                    }, {
+                        'selector': 'thead th:not(:first-child)',
+                        'props': [('text-align', 'center')]  # Center headers except the first
+                    }, {
+                        'selector': 'thead th:last-child',
+                        'props': [('color', 'black')]  # Make last column header black
+                    }, {
+                        'selector': 'td',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'center')]
+                    }, {
+                        'selector': 'th',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'left')]
+                    }]
+                ).set_properties(**{'padding': '2px', 'font-size': '15px'})
+
+                return styled_df
+
+            # Main function to process the data
+            def main():
+                # Assuming jogador_1_metrics and jogador_2_metrics are already defined with the necessary columns (Métricas, Values, Percentiles)
+
+                # Merge the two tables
+                merged_metrics = merge_metrics_tables(jogador_1_metrics, jogador_2_metrics)
+
+                # Style the merged table
+                styled_merged_metrics = style_merged_table(merged_metrics)
+
+                # Convert to HTML and display (for Streamlit, you'd use st.markdown)
+                merged_html = styled_merged_metrics.to_html(escape=False, index=False)
+                center_html = f"<div style='margin-left: auto; margin-right: auto; width: fit-content;'>{merged_html}</div>"
+
+                # Output the final table (for Streamlit, you'd use st.markdown)
+                st.markdown(center_html, unsafe_allow_html=True)
+
+            if __name__ == '__main__':
+                main()
+
+
+            # Function to plot the legend using the same colors as the apply_colormap_based_on_value function
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
+            def plot_color_legend():
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
+                
+                # Labels for the legend (highest to lowest)
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
+                # Plot the legend horizontally with a smaller size
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
+                    ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
+                ax.set_ylim(0, 1)
+                ax.axis('off')  # Remove axes
+
+                # Add an arrow pointing from "Highest" to "Lowest"
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
+
+                return fig
+
+            # Call the function to plot the legend and display it in Streamlit
+            legend_fig = plot_color_legend()
+            st.pyplot(legend_fig)            
+
+
+######################################################################################################################################
 
             #Plotar Primeiro Gráfico - Radar de Percentis do Jogador na liga:
             st.markdown("<h3 style='text-align: center; color: blue; '>Comparação do Desempenho dos Jogadores em 2024<br><br>Perfil: Extremo Agudo</h3>", unsafe_allow_html=True)
             Lateral_Charts = pd.read_csv('PlayerAnalysis_Role_19.csv')
 
             Lateral_Charts_1 = Lateral_Charts[
-            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe'] == equipe_1)) |
-            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe'] == equipe_2))
+            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_1)) |
+            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_2))
             ]
 
             # Reindex to ensure the correct order
@@ -11840,6 +14315,256 @@ if choose == "Compare Jogadores":
 
 
 ######################################################################################################################################
+            # Define column metricas
+            metricas = ['Duelos Ofensivos Ganhos', 'Pisadas Área', 'Dribles BemSucedidos', 
+                        'Acelerações', 'Passes Longos Recebidos', 'xG', 'Finalizações NoAlvo', 
+                        'Conversão Gols', 'xA', 'Assistência Finalização', 'Deep Completions', 
+                        'Deep Completed Crosses', 'Passes Chave']
+
+            # #Elaborar Tabela com Métricas do Atleta
+            jogador_1_metrics = pd.read_csv('19_Role_Extremo_Agudo.csv')
+            jogador_1_percents = pd.read_csv('PlayerAnalysis_Role_19.csv')
+            #Collecting metrics for jogador_1
+            jogador_1_metrics = jogador_1_metrics[
+            ((jogador_1_metrics['Atleta'] == jogador_1) & (jogador_1_metrics['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_metrics = jogador_1_metrics.iloc[:, np.r_[1, 18:31]].reset_index(drop=True)
+            #jogador_1_metrics = jogador_1_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_1_metrics = jogador_1_metrics.round(decimals=2)
+            jogador_1_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_1
+            jogador_1_percents = jogador_1_percents[
+            ((jogador_1_percents['Atleta'] == jogador_1) & (jogador_1_percents['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_percents = jogador_1_percents.iloc[:, np.r_[15, 66:79]].reset_index(drop=True)
+            #jogador_1_percents = jogador_1_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_1_percents = jogador_1_percents.round(decimals=0)
+            jogador_1_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_1 + "_percent"
+            jogador_1_percents.iloc[0, 0] = jogador_1 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_1_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_1_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_1_metrics = pd.concat([jogador_1_metrics, jogador_1_percents])
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_1_metrics.columns = jogador_1_metrics.iloc[0]  # Set the first row as the header
+            jogador_1_metrics = jogador_1_metrics.drop(jogador_1_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics.insert(0, 'Métricas', metricas)
+            
+            
+#################################################################################################################
+
+            # #Elaborar Tabela com Métricas do Jogador_2
+            jogador_2_metrics = pd.read_csv('19_Role_Extremo_Agudo.csv')
+            jogador_2_percents = pd.read_csv('PlayerAnalysis_Role_19.csv')
+            #Collecting metrics for jogador_2
+            jogador_2_metrics = jogador_2_metrics[
+            ((jogador_2_metrics['Atleta'] == jogador_2) & (jogador_2_metrics['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_metrics = jogador_2_metrics.iloc[:, np.r_[1, 18:31]].reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_2_metrics = jogador_2_metrics.round(decimals=2)
+            jogador_2_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_2
+            jogador_2_percents = jogador_2_percents[
+            ((jogador_2_percents['Atleta'] == jogador_2) & (jogador_2_percents['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_percents = jogador_2_percents.iloc[:, np.r_[15, 66:79]].reset_index(drop=True)
+            #jogador_2_percents = jogador_2_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_2_percents = jogador_2_percents.round(decimals=0)
+            jogador_2_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_2 + "_percent"
+            jogador_2_percents.iloc[0, 0] = jogador_2 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_2_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_2_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_2_metrics = pd.concat([jogador_2_metrics, jogador_2_percents])
+            jogador_2_metrics = jogador_2_metrics.reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_2_metrics.columns = jogador_2_metrics.iloc[0]  # Set the first row as the header
+            jogador_2_metrics = jogador_2_metrics.drop(jogador_2_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_2_metrics.insert(0, 'Métricas', metricas)
+            
+
+
+            # Function to apply conditional formatting based on the percentile values
+            def apply_colormap_based_on_value(val):
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 75 <= val < 90:
+                    color = cmap2(0.50)  # "Destaque"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 60 <= val < 75:
+                    color = cmap(0.50)  # "Razoável"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 40 <= val < 60:
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                else:
+                    color = cmap1(0.50)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+            # Function to apply the colormap to a specified column based on the corresponding percentiles column
+            def apply_colormap_to_column_based_on_percentiles(styler, df, values_col, percentiles_col):
+                colormap_styles = [apply_colormap_based_on_value(val) for val in df[percentiles_col]]
+                return styler.apply(lambda _: colormap_styles, subset=[values_col])
+
+            # Function to merge jogador_1_metrics and jogador_2_metrics
+            def merge_metrics_tables(jogador_1_metrics, jogador_2_metrics):
+                # Rename the columns for each player
+                jogador_1_metrics.columns = ['Métricas', jogador_1, 'Player 1 Percentiles']
+                jogador_2_metrics.columns = ['Métricas', jogador_2, 'Player 2 Percentiles']
+
+                # Merge the two DataFrames on the "Métricas" column
+                merged_df = pd.merge(jogador_1_metrics[['Métricas', jogador_1, 'Player 1 Percentiles']],
+                                    jogador_2_metrics[['Métricas', jogador_2, 'Player 2 Percentiles']],
+                                    on='Métricas')
+
+                return merged_df
+
+            # Styling function for merged DataFrame
+            def style_merged_table(merged_df):
+                # Create a Styler object from the merged DataFrame
+                styled_df = merged_df.style
+
+                # Apply colormap to jogador_1 values based on Player 1 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_1, 'Player 1 Percentiles')
+
+                # Apply colormap to jogador_2 values based on Player 2 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_2, 'Player 2 Percentiles')
+                
+                # Format both jogador_1 and jogador_2 columns to display 2 decimal places
+                styled_df = styled_df.format({jogador_1: "{:.2f}", jogador_2: "{:.2f}"})
+                
+                # Left-align column[0] ("Métricas") and center columns[1, 2] ("jogador_1" and "jogador_2")
+                styled_df = styled_df.set_properties(subset=['Métricas'], **{'text-align': 'left'})
+                styled_df = styled_df.set_properties(subset=[jogador_1, jogador_2], **{'text-align': 'center'})
+
+                # Drop both percentile columns from the final display
+                styled_df = styled_df.hide(axis='columns', subset=['Player 1 Percentiles', 'Player 2 Percentiles'])
+
+                # Apply table styles as in the LAST CODE
+                styled_df = styled_df.set_table_styles(
+                    [{
+                        'selector': 'thead th',
+                        'props': [('font-weight', 'bold'),
+                                ('border-style', 'solid'),
+                                ('border-width', '0px 0px 2px 0px'),
+                                ('border-color', 'black')]
+                    }, {
+                        'selector': 'thead th:not(:first-child)',
+                        'props': [('text-align', 'center')]  # Center headers except the first
+                    }, {
+                        'selector': 'thead th:last-child',
+                        'props': [('color', 'black')]  # Make last column header black
+                    }, {
+                        'selector': 'td',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'center')]
+                    }, {
+                        'selector': 'th',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'left')]
+                    }]
+                ).set_properties(**{'padding': '2px', 'font-size': '15px'})
+
+                return styled_df
+
+            # Main function to process the data
+            def main():
+                # Assuming jogador_1_metrics and jogador_2_metrics are already defined with the necessary columns (Métricas, Values, Percentiles)
+
+                # Merge the two tables
+                merged_metrics = merge_metrics_tables(jogador_1_metrics, jogador_2_metrics)
+
+                # Style the merged table
+                styled_merged_metrics = style_merged_table(merged_metrics)
+
+                # Convert to HTML and display (for Streamlit, you'd use st.markdown)
+                merged_html = styled_merged_metrics.to_html(escape=False, index=False)
+                center_html = f"<div style='margin-left: auto; margin-right: auto; width: fit-content;'>{merged_html}</div>"
+
+                # Output the final table (for Streamlit, you'd use st.markdown)
+                st.markdown(center_html, unsafe_allow_html=True)
+
+            if __name__ == '__main__':
+                main()
+
+
+            # Function to plot the legend using the same colors as the apply_colormap_based_on_value function
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
+            def plot_color_legend():
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
+                
+                # Labels for the legend (highest to lowest)
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
+                # Plot the legend horizontally with a smaller size
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
+                    ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
+                ax.set_ylim(0, 1)
+                ax.axis('off')  # Remove axes
+
+                # Add an arrow pointing from "Highest" to "Lowest"
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
+
+                return fig
+
+            # Call the function to plot the legend and display it in Streamlit
+            legend_fig = plot_color_legend()
+            st.pyplot(legend_fig)            
+
+
+######################################################################################################################################
 ######################################################################################################################################
 
         elif (posição_1 == posição_2 == ("Atacante")):
@@ -11849,8 +14574,8 @@ if choose == "Compare Jogadores":
             Lateral_Charts = pd.read_csv('PlayerAnalysis_Role_20.csv')
 
             Lateral_Charts_1 = Lateral_Charts[
-            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe'] == equipe_1)) |
-            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe'] == equipe_2))
+            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_1)) |
+            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_2))
             ]
 
             # Reindex to ensure the correct order
@@ -11918,6 +14643,253 @@ if choose == "Compare Jogadores":
             )
             st.pyplot(fig)
 
+######################################################################################################################################
+            # Define column metricas
+            metricas = ['Duelos Aéreos Ganhos', 'Duelos Ofensivos Ganhos', 'xG', 'Conversão Gols', 
+                        'Conversão xG', 'Ameaça Ofensiva', 'xA', 'Deep Completions', 'Passes Chave', 
+                        'Passes ÁreaPênalti Certos']
+
+            # #Elaborar Tabela com Métricas do Atleta
+            jogador_1_metrics = pd.read_csv('20_Role_Atacante_Referência.csv')
+            jogador_1_percents = pd.read_csv('PlayerAnalysis_Role_20.csv')
+            #Collecting metrics for jogador_1
+            jogador_1_metrics = jogador_1_metrics[
+            ((jogador_1_metrics['Atleta'] == jogador_1) & (jogador_1_metrics['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_metrics = jogador_1_metrics.iloc[:, np.r_[1, 18:28]].reset_index(drop=True)
+            #jogador_1_metrics = jogador_1_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_1_metrics = jogador_1_metrics.round(decimals=2)
+            jogador_1_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_1
+            jogador_1_percents = jogador_1_percents[
+            ((jogador_1_percents['Atleta'] == jogador_1) & (jogador_1_percents['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_percents = jogador_1_percents.iloc[:, np.r_[12, 57:67]].reset_index(drop=True)
+            #jogador_1_percents = jogador_1_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_1_percents = jogador_1_percents.round(decimals=0)
+            jogador_1_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_1 + "_percent"
+            jogador_1_percents.iloc[0, 0] = jogador_1 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_1_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_1_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_1_metrics = pd.concat([jogador_1_metrics, jogador_1_percents])
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_1_metrics.columns = jogador_1_metrics.iloc[0]  # Set the first row as the header
+            jogador_1_metrics = jogador_1_metrics.drop(jogador_1_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics.insert(0, 'Métricas', metricas)
+            
+            
+#################################################################################################################
+
+            # #Elaborar Tabela com Métricas do Jogador_2
+            jogador_2_metrics = pd.read_csv('20_Role_Atacante_Referência.csv')
+            jogador_2_percents = pd.read_csv('PlayerAnalysis_Role_20.csv')
+            #Collecting metrics for jogador_2
+            jogador_2_metrics = jogador_2_metrics[
+            ((jogador_2_metrics['Atleta'] == jogador_2) & (jogador_2_metrics['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_metrics = jogador_2_metrics.iloc[:, np.r_[1, 18:28]].reset_index(drop=True)
+            #jogador_2_metrics = jogador_2_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_2_metrics = jogador_2_metrics.round(decimals=2)
+            jogador_2_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_2
+            jogador_2_percents = jogador_2_percents[
+            ((jogador_2_percents['Atleta'] == jogador_2) & (jogador_2_percents['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_percents = jogador_2_percents.iloc[:, np.r_[12, 57:67]].reset_index(drop=True)
+            #jogador_2_percents = jogador_2_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_2_percents = jogador_2_percents.round(decimals=0)
+            jogador_2_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_2 + "_percent"
+            jogador_2_percents.iloc[0, 0] = jogador_2 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_2_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_2_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_2_metrics = pd.concat([jogador_2_metrics, jogador_2_percents])
+            jogador_2_metrics = jogador_2_metrics.reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_2_metrics.columns = jogador_2_metrics.iloc[0]  # Set the first row as the header
+            jogador_2_metrics = jogador_2_metrics.drop(jogador_2_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_2_metrics.insert(0, 'Métricas', metricas)
+            
+
+
+            # Function to apply conditional formatting based on the percentile values
+            def apply_colormap_based_on_value(val):
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 75 <= val < 90:
+                    color = cmap2(0.50)  # "Destaque"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 60 <= val < 75:
+                    color = cmap(0.50)  # "Razoável"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 40 <= val < 60:
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                else:
+                    color = cmap1(0.50)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+            # Function to apply the colormap to a specified column based on the corresponding percentiles column
+            def apply_colormap_to_column_based_on_percentiles(styler, df, values_col, percentiles_col):
+                colormap_styles = [apply_colormap_based_on_value(val) for val in df[percentiles_col]]
+                return styler.apply(lambda _: colormap_styles, subset=[values_col])
+
+            # Function to merge jogador_1_metrics and jogador_2_metrics
+            def merge_metrics_tables(jogador_1_metrics, jogador_2_metrics):
+                # Rename the columns for each player
+                jogador_1_metrics.columns = ['Métricas', jogador_1, 'Player 1 Percentiles']
+                jogador_2_metrics.columns = ['Métricas', jogador_2, 'Player 2 Percentiles']
+
+                # Merge the two DataFrames on the "Métricas" column
+                merged_df = pd.merge(jogador_1_metrics[['Métricas', jogador_1, 'Player 1 Percentiles']],
+                                    jogador_2_metrics[['Métricas', jogador_2, 'Player 2 Percentiles']],
+                                    on='Métricas')
+
+                return merged_df
+
+            # Styling function for merged DataFrame
+            def style_merged_table(merged_df):
+                # Create a Styler object from the merged DataFrame
+                styled_df = merged_df.style
+
+                # Apply colormap to jogador_1 values based on Player 1 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_1, 'Player 1 Percentiles')
+
+                # Apply colormap to jogador_2 values based on Player 2 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_2, 'Player 2 Percentiles')
+                
+                # Format both jogador_1 and jogador_2 columns to display 2 decimal places
+                styled_df = styled_df.format({jogador_1: "{:.2f}", jogador_2: "{:.2f}"})
+                
+                # Left-align column[0] ("Métricas") and center columns[1, 2] ("jogador_1" and "jogador_2")
+                styled_df = styled_df.set_properties(subset=['Métricas'], **{'text-align': 'left'})
+                styled_df = styled_df.set_properties(subset=[jogador_1, jogador_2], **{'text-align': 'center'})
+
+                # Drop both percentile columns from the final display
+                styled_df = styled_df.hide(axis='columns', subset=['Player 1 Percentiles', 'Player 2 Percentiles'])
+
+                # Apply table styles as in the LAST CODE
+                styled_df = styled_df.set_table_styles(
+                    [{
+                        'selector': 'thead th',
+                        'props': [('font-weight', 'bold'),
+                                ('border-style', 'solid'),
+                                ('border-width', '0px 0px 2px 0px'),
+                                ('border-color', 'black')]
+                    }, {
+                        'selector': 'thead th:not(:first-child)',
+                        'props': [('text-align', 'center')]  # Center headers except the first
+                    }, {
+                        'selector': 'thead th:last-child',
+                        'props': [('color', 'black')]  # Make last column header black
+                    }, {
+                        'selector': 'td',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'center')]
+                    }, {
+                        'selector': 'th',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'left')]
+                    }]
+                ).set_properties(**{'padding': '2px', 'font-size': '15px'})
+
+                return styled_df
+
+            # Main function to process the data
+            def main():
+                # Assuming jogador_1_metrics and jogador_2_metrics are already defined with the necessary columns (Métricas, Values, Percentiles)
+
+                # Merge the two tables
+                merged_metrics = merge_metrics_tables(jogador_1_metrics, jogador_2_metrics)
+
+                # Style the merged table
+                styled_merged_metrics = style_merged_table(merged_metrics)
+
+                # Convert to HTML and display (for Streamlit, you'd use st.markdown)
+                merged_html = styled_merged_metrics.to_html(escape=False, index=False)
+                center_html = f"<div style='margin-left: auto; margin-right: auto; width: fit-content;'>{merged_html}</div>"
+
+                # Output the final table (for Streamlit, you'd use st.markdown)
+                st.markdown(center_html, unsafe_allow_html=True)
+
+            if __name__ == '__main__':
+                main()
+
+
+            # Function to plot the legend using the same colors as the apply_colormap_based_on_value function
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
+            def plot_color_legend():
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
+                
+                # Labels for the legend (highest to lowest)
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
+                # Plot the legend horizontally with a smaller size
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
+                    ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
+                ax.set_ylim(0, 1)
+                ax.axis('off')  # Remove axes
+
+                # Add an arrow pointing from "Highest" to "Lowest"
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
+
+                return fig
+
+            # Call the function to plot the legend and display it in Streamlit
+            legend_fig = plot_color_legend()
+            st.pyplot(legend_fig)            
 
 ######################################################################################################################################
             
@@ -11926,8 +14898,8 @@ if choose == "Compare Jogadores":
             Lateral_Charts = pd.read_csv('PlayerAnalysis_Role_21.csv')
 
             Lateral_Charts_1 = Lateral_Charts[
-            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe'] == equipe_1)) |
-            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe'] == equipe_2))
+            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_1)) |
+            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_2))
             ]
 
             # Reindex to ensure the correct order
@@ -11995,6 +14967,253 @@ if choose == "Compare Jogadores":
             )
             st.pyplot(fig)
 
+######################################################################################################################################
+            # Define column metricas
+            metricas = ['Duelos Ofensivos Ganhos', 'Dribles BemSucedidos', 'Acelerações', 
+                        'xG', 'Conversão Gols', 'Conversão xG', 'Ameaça Ofensiva', 'xA', 
+                        'Assistência Finalização']
+
+            # #Elaborar Tabela com Métricas do Atleta
+            jogador_1_metrics = pd.read_csv('21_Role_Atacante_Móvel.csv')
+            jogador_1_percents = pd.read_csv('PlayerAnalysis_Role_21.csv')
+            #Collecting metrics for jogador_1
+            jogador_1_metrics = jogador_1_metrics[
+            ((jogador_1_metrics['Atleta'] == jogador_1) & (jogador_1_metrics['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_metrics = jogador_1_metrics.iloc[:, np.r_[1, 18:27]].reset_index(drop=True)
+            #jogador_1_metrics = jogador_1_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_1_metrics = jogador_1_metrics.round(decimals=2)
+            jogador_1_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_1
+            jogador_1_percents = jogador_1_percents[
+            ((jogador_1_percents['Atleta'] == jogador_1) & (jogador_1_percents['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_percents = jogador_1_percents.iloc[:, np.r_[11, 54:63]].reset_index(drop=True)
+            #jogador_1_percents = jogador_1_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_1_percents = jogador_1_percents.round(decimals=0)
+            jogador_1_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_1 + "_percent"
+            jogador_1_percents.iloc[0, 0] = jogador_1 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_1_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_1_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_1_metrics = pd.concat([jogador_1_metrics, jogador_1_percents])
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_1_metrics.columns = jogador_1_metrics.iloc[0]  # Set the first row as the header
+            jogador_1_metrics = jogador_1_metrics.drop(jogador_1_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics.insert(0, 'Métricas', metricas)
+            
+            
+#################################################################################################################
+
+            # #Elaborar Tabela com Métricas do Jogador_2
+            jogador_2_metrics = pd.read_csv('21_Role_Atacante_Móvel.csv')
+            jogador_2_percents = pd.read_csv('PlayerAnalysis_Role_21.csv')
+            #Collecting metrics for jogador_2
+            jogador_2_metrics = jogador_2_metrics[
+            ((jogador_2_metrics['Atleta'] == jogador_2) & (jogador_2_metrics['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_metrics = jogador_2_metrics.iloc[:, np.r_[1, 18:27]].reset_index(drop=True)
+            #jogador_2_metrics = jogador_2_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_2_metrics = jogador_2_metrics.round(decimals=2)
+            jogador_2_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_2
+            jogador_2_percents = jogador_2_percents[
+            ((jogador_2_percents['Atleta'] == jogador_2) & (jogador_2_percents['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_percents = jogador_2_percents.iloc[:, np.r_[11, 54:63]].reset_index(drop=True)
+            #jogador_2_percents = jogador_2_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_2_percents = jogador_2_percents.round(decimals=0)
+            jogador_2_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_2 + "_percent"
+            jogador_2_percents.iloc[0, 0] = jogador_2 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_2_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_2_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_2_metrics = pd.concat([jogador_2_metrics, jogador_2_percents])
+            jogador_2_metrics = jogador_2_metrics.reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_2_metrics.columns = jogador_2_metrics.iloc[0]  # Set the first row as the header
+            jogador_2_metrics = jogador_2_metrics.drop(jogador_2_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_2_metrics.insert(0, 'Métricas', metricas)
+            
+
+
+            # Function to apply conditional formatting based on the percentile values
+            def apply_colormap_based_on_value(val):
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 75 <= val < 90:
+                    color = cmap2(0.50)  # "Destaque"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 60 <= val < 75:
+                    color = cmap(0.50)  # "Razoável"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 40 <= val < 60:
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                else:
+                    color = cmap1(0.50)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+            # Function to apply the colormap to a specified column based on the corresponding percentiles column
+            def apply_colormap_to_column_based_on_percentiles(styler, df, values_col, percentiles_col):
+                colormap_styles = [apply_colormap_based_on_value(val) for val in df[percentiles_col]]
+                return styler.apply(lambda _: colormap_styles, subset=[values_col])
+
+            # Function to merge jogador_1_metrics and jogador_2_metrics
+            def merge_metrics_tables(jogador_1_metrics, jogador_2_metrics):
+                # Rename the columns for each player
+                jogador_1_metrics.columns = ['Métricas', jogador_1, 'Player 1 Percentiles']
+                jogador_2_metrics.columns = ['Métricas', jogador_2, 'Player 2 Percentiles']
+
+                # Merge the two DataFrames on the "Métricas" column
+                merged_df = pd.merge(jogador_1_metrics[['Métricas', jogador_1, 'Player 1 Percentiles']],
+                                    jogador_2_metrics[['Métricas', jogador_2, 'Player 2 Percentiles']],
+                                    on='Métricas')
+
+                return merged_df
+
+            # Styling function for merged DataFrame
+            def style_merged_table(merged_df):
+                # Create a Styler object from the merged DataFrame
+                styled_df = merged_df.style
+
+                # Apply colormap to jogador_1 values based on Player 1 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_1, 'Player 1 Percentiles')
+
+                # Apply colormap to jogador_2 values based on Player 2 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_2, 'Player 2 Percentiles')
+                
+                # Format both jogador_1 and jogador_2 columns to display 2 decimal places
+                styled_df = styled_df.format({jogador_1: "{:.2f}", jogador_2: "{:.2f}"})
+                
+                # Left-align column[0] ("Métricas") and center columns[1, 2] ("jogador_1" and "jogador_2")
+                styled_df = styled_df.set_properties(subset=['Métricas'], **{'text-align': 'left'})
+                styled_df = styled_df.set_properties(subset=[jogador_1, jogador_2], **{'text-align': 'center'})
+
+                # Drop both percentile columns from the final display
+                styled_df = styled_df.hide(axis='columns', subset=['Player 1 Percentiles', 'Player 2 Percentiles'])
+
+                # Apply table styles as in the LAST CODE
+                styled_df = styled_df.set_table_styles(
+                    [{
+                        'selector': 'thead th',
+                        'props': [('font-weight', 'bold'),
+                                ('border-style', 'solid'),
+                                ('border-width', '0px 0px 2px 0px'),
+                                ('border-color', 'black')]
+                    }, {
+                        'selector': 'thead th:not(:first-child)',
+                        'props': [('text-align', 'center')]  # Center headers except the first
+                    }, {
+                        'selector': 'thead th:last-child',
+                        'props': [('color', 'black')]  # Make last column header black
+                    }, {
+                        'selector': 'td',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'center')]
+                    }, {
+                        'selector': 'th',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'left')]
+                    }]
+                ).set_properties(**{'padding': '2px', 'font-size': '15px'})
+
+                return styled_df
+
+            # Main function to process the data
+            def main():
+                # Assuming jogador_1_metrics and jogador_2_metrics are already defined with the necessary columns (Métricas, Values, Percentiles)
+
+                # Merge the two tables
+                merged_metrics = merge_metrics_tables(jogador_1_metrics, jogador_2_metrics)
+
+                # Style the merged table
+                styled_merged_metrics = style_merged_table(merged_metrics)
+
+                # Convert to HTML and display (for Streamlit, you'd use st.markdown)
+                merged_html = styled_merged_metrics.to_html(escape=False, index=False)
+                center_html = f"<div style='margin-left: auto; margin-right: auto; width: fit-content;'>{merged_html}</div>"
+
+                # Output the final table (for Streamlit, you'd use st.markdown)
+                st.markdown(center_html, unsafe_allow_html=True)
+
+            if __name__ == '__main__':
+                main()
+
+
+            # Function to plot the legend using the same colors as the apply_colormap_based_on_value function
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
+            def plot_color_legend():
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
+                
+                # Labels for the legend (highest to lowest)
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
+                # Plot the legend horizontally with a smaller size
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
+                    ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
+                ax.set_ylim(0, 1)
+                ax.axis('off')  # Remove axes
+
+                # Add an arrow pointing from "Highest" to "Lowest"
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
+
+                return fig
+
+            # Call the function to plot the legend and display it in Streamlit
+            legend_fig = plot_color_legend()
+            st.pyplot(legend_fig)            
 
 ######################################################################################################################################
 
@@ -12003,8 +15222,8 @@ if choose == "Compare Jogadores":
             Lateral_Charts = pd.read_csv('PlayerAnalysis_Role_22.csv')
 
             Lateral_Charts_1 = Lateral_Charts[
-            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe'] == equipe_1)) |
-            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe'] == equipe_2))
+            ((Lateral_Charts['Atleta'] == jogador_1) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_1)) |
+            ((Lateral_Charts['Atleta'] == jogador_2) & (Lateral_Charts['Equipe_Janela_Análise'] == equipe_2))
             ]
 
             # Reindex to ensure the correct order
@@ -12125,6 +15344,255 @@ if choose == "Compare Jogadores":
             )
             st.pyplot(fig)
 
+######################################################################################################################################
+            # Define column metricas
+            metricas = ['Duelos Ofensivos Ganhos', 'Dribles BemSucedidos', 'Acelerações', 'xG', 
+                        'Finalizações NoAlvo', 'Conversão Gols', 'Conversão xG', 'Ameaça Ofensiva', 
+                        'xA', 'Assistência Finalização', 'Deep Completions', 'Passes Chave', 
+                        'Passes ÁreaPênalti Certos']
+
+            # #Elaborar Tabela com Métricas do Atleta
+            jogador_1_metrics = pd.read_csv('22_Role_Segundo_Atacante.csv')
+            jogador_1_percents = pd.read_csv('PlayerAnalysis_Role_22.csv')
+            #Collecting metrics for jogador_1
+            jogador_1_metrics = jogador_1_metrics[
+            ((jogador_1_metrics['Atleta'] == jogador_1) & (jogador_1_metrics['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_metrics = jogador_1_metrics.iloc[:, np.r_[1, 18:31]].reset_index(drop=True)
+            #jogador_1_metrics = jogador_1_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_1_metrics = jogador_1_metrics.round(decimals=2)
+            jogador_1_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_1
+            jogador_1_percents = jogador_1_percents[
+            ((jogador_1_percents['Atleta'] == jogador_1) & (jogador_1_percents['Equipe_Janela_Análise'] == equipe_1))]
+            jogador_1_percents = jogador_1_percents.iloc[:, np.r_[15, 66:79]].reset_index(drop=True)
+            #jogador_1_percents = jogador_1_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_1_percents = jogador_1_percents.round(decimals=0)
+            jogador_1_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_1 + "_percent"
+            jogador_1_percents.iloc[0, 0] = jogador_1 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_1_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_1_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_1_metrics = pd.concat([jogador_1_metrics, jogador_1_percents])
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics = jogador_1_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_1_metrics.columns = jogador_1_metrics.iloc[0]  # Set the first row as the header
+            jogador_1_metrics = jogador_1_metrics.drop(jogador_1_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_1_metrics.insert(0, 'Métricas', metricas)
+            
+            
+#################################################################################################################
+
+            # #Elaborar Tabela com Métricas do Jogador_2
+            jogador_2_metrics = pd.read_csv('22_Role_Segundo_Atacante.csv')
+            jogador_2_percents = pd.read_csv('PlayerAnalysis_Role_22.csv')
+            #Collecting metrics for jogador_2
+            jogador_2_metrics = jogador_2_metrics[
+            ((jogador_2_metrics['Atleta'] == jogador_2) & (jogador_2_metrics['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_metrics = jogador_2_metrics.iloc[:, np.r_[1, 18:31]].reset_index(drop=True)
+            #jogador_2_metrics = jogador_2_metrics.rename(columns={'Interceptações.1':'Interceptações'})
+            jogador_2_metrics = jogador_2_metrics.round(decimals=2)
+            jogador_2_metrics.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+                        
+            #Collecting percentiles for jogador_2
+            jogador_2_percents = jogador_2_percents[
+            ((jogador_2_percents['Atleta'] == jogador_2) & (jogador_2_percents['Equipe_Janela_Análise'] == equipe_2))]
+            jogador_2_percents = jogador_2_percents.iloc[:, np.r_[15, 66:79]].reset_index(drop=True)
+            #jogador_2_percents = jogador_2_percents.rename(columns={'Interceptações.1_Percentil':'Interceptações_Percentil'})
+            jogador_2_percents = jogador_2_percents.round(decimals=0)
+            jogador_2_percents.rename(columns={'Atleta': 'Métricas'}, inplace=True)
+            # Replace the cell at [0, 0] with jogador_2 + "_percent"
+            jogador_2_percents.iloc[0, 0] = jogador_2 + "_percent"
+            
+            # Create a dictionary of columns to rename by removing the '_percentil' suffix
+            columns_to_rename = {
+                col: col.replace('_Percentil', '') for col in jogador_2_percents.columns if '_Percentil' in col
+            }            
+
+            #Collecting data to plot
+            jogador_2_percents.rename(columns=columns_to_rename, inplace=True)
+                                  
+            #Concatenating metrics and percentiles for jogador 1
+            jogador_2_metrics = pd.concat([jogador_2_metrics, jogador_2_percents])
+            jogador_2_metrics = jogador_2_metrics.reset_index(drop=True)
+            jogador_2_metrics = jogador_2_metrics.transpose()
+            # Remove the index by resetting it and using new headers
+            jogador_2_metrics.columns = jogador_2_metrics.iloc[0]  # Set the first row as the header
+            jogador_2_metrics = jogador_2_metrics.drop(jogador_2_metrics.index[0])  # Drop the old header row
+            jogador_1_metrics = jogador_1_metrics.reset_index(drop=True)
+            jogador_2_metrics.insert(0, 'Métricas', metricas)
+            
+
+
+            # Function to apply conditional formatting based on the percentile values
+            def apply_colormap_based_on_value(val):
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                if pd.isna(val):
+                    return ''  # No styling for NaN values
+                elif val >= 90:
+                    color = cmap2(0.70)  # "Elite"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 75 <= val < 90:
+                    color = cmap2(0.50)  # "Destaque"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 60 <= val < 75:
+                    color = cmap(0.50)  # "Razoável"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 40 <= val < 60:
+                    color = cmap(0.25)  # "Mediano"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                elif 20 <= val < 40:
+                    color = cmap1(0.30)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+                else:
+                    color = cmap1(0.50)  # Orange color for "Frágil"
+                    return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, 0.8); color: black'
+            # Function to apply the colormap to a specified column based on the corresponding percentiles column
+            def apply_colormap_to_column_based_on_percentiles(styler, df, values_col, percentiles_col):
+                colormap_styles = [apply_colormap_based_on_value(val) for val in df[percentiles_col]]
+                return styler.apply(lambda _: colormap_styles, subset=[values_col])
+
+            # Function to merge jogador_1_metrics and jogador_2_metrics
+            def merge_metrics_tables(jogador_1_metrics, jogador_2_metrics):
+                # Rename the columns for each player
+                jogador_1_metrics.columns = ['Métricas', jogador_1, 'Player 1 Percentiles']
+                jogador_2_metrics.columns = ['Métricas', jogador_2, 'Player 2 Percentiles']
+
+                # Merge the two DataFrames on the "Métricas" column
+                merged_df = pd.merge(jogador_1_metrics[['Métricas', jogador_1, 'Player 1 Percentiles']],
+                                    jogador_2_metrics[['Métricas', jogador_2, 'Player 2 Percentiles']],
+                                    on='Métricas')
+
+                return merged_df
+
+            # Styling function for merged DataFrame
+            def style_merged_table(merged_df):
+                # Create a Styler object from the merged DataFrame
+                styled_df = merged_df.style
+
+                # Apply colormap to jogador_1 values based on Player 1 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_1, 'Player 1 Percentiles')
+
+                # Apply colormap to jogador_2 values based on Player 2 percentiles
+                styled_df = apply_colormap_to_column_based_on_percentiles(styled_df, merged_df, jogador_2, 'Player 2 Percentiles')
+                
+                # Format both jogador_1 and jogador_2 columns to display 2 decimal places
+                styled_df = styled_df.format({jogador_1: "{:.2f}", jogador_2: "{:.2f}"})
+                
+                # Left-align column[0] ("Métricas") and center columns[1, 2] ("jogador_1" and "jogador_2")
+                styled_df = styled_df.set_properties(subset=['Métricas'], **{'text-align': 'left'})
+                styled_df = styled_df.set_properties(subset=[jogador_1, jogador_2], **{'text-align': 'center'})
+
+                # Drop both percentile columns from the final display
+                styled_df = styled_df.hide(axis='columns', subset=['Player 1 Percentiles', 'Player 2 Percentiles'])
+
+                # Apply table styles as in the LAST CODE
+                styled_df = styled_df.set_table_styles(
+                    [{
+                        'selector': 'thead th',
+                        'props': [('font-weight', 'bold'),
+                                ('border-style', 'solid'),
+                                ('border-width', '0px 0px 2px 0px'),
+                                ('border-color', 'black')]
+                    }, {
+                        'selector': 'thead th:not(:first-child)',
+                        'props': [('text-align', 'center')]  # Center headers except the first
+                    }, {
+                        'selector': 'thead th:last-child',
+                        'props': [('color', 'black')]  # Make last column header black
+                    }, {
+                        'selector': 'td',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'center')]
+                    }, {
+                        'selector': 'th',
+                        'props': [('border-style', 'solid'),
+                                ('border-width', '0px 0px 1px 0px'),
+                                ('border-color', 'black'),
+                                ('text-align', 'left')]
+                    }]
+                ).set_properties(**{'padding': '2px', 'font-size': '15px'})
+
+                return styled_df
+
+            # Main function to process the data
+            def main():
+                # Assuming jogador_1_metrics and jogador_2_metrics are already defined with the necessary columns (Métricas, Values, Percentiles)
+
+                # Merge the two tables
+                merged_metrics = merge_metrics_tables(jogador_1_metrics, jogador_2_metrics)
+
+                # Style the merged table
+                styled_merged_metrics = style_merged_table(merged_metrics)
+
+                # Convert to HTML and display (for Streamlit, you'd use st.markdown)
+                merged_html = styled_merged_metrics.to_html(escape=False, index=False)
+                center_html = f"<div style='margin-left: auto; margin-right: auto; width: fit-content;'>{merged_html}</div>"
+
+                # Output the final table (for Streamlit, you'd use st.markdown)
+                st.markdown(center_html, unsafe_allow_html=True)
+
+            if __name__ == '__main__':
+                main()
+
+
+            # Function to plot the legend using the same colors as the apply_colormap_based_on_value function
+            st.markdown("<br><h5 style='text-align: center;'>Legenda Baseada no Percentil do Jogador na Liga</h5>", unsafe_allow_html=True)
+
+            def plot_color_legend():
+                # Custom colors for the categories (using the same logic as in apply_colormap_based_on_value)
+                cmap = plt.get_cmap("Blues")
+                cmap1 = plt.get_cmap("Reds")
+                cmap2 = plt.get_cmap("Greens")
+
+                # Assign colors using the same logic
+                colors = [
+                    cmap2(0.70),   # "Elite"
+                    cmap2(0.50),  # "Destaque"
+                    cmap(0.50),   # "Razoável"
+                    cmap(0.25),  # "Mediano"
+                    cmap1(0.30), # "Frágil"
+                    cmap1(0.50)  # "Péssimo"
+                ]
+                
+                # Labels for the legend (highest to lowest)
+                labels = ['Elite (>=90)', 'Destaque (75-90)', 'Razoável (60-75)', 'Mediano (40-60)', 'Frágil (20-40)', 'Péssimo (<20)']
+
+                # Plot the legend horizontally with a smaller size
+                fig, ax = plt.subplots(figsize=(6, 0.3))  # Smaller layout
+                for i, (label, color) in enumerate(zip(labels[::-1], colors[::-1])):  # Reverse labels for display
+                    ax.add_patch(plt.Rectangle((i, 0), 1, 1, facecolor=color, edgecolor='black'))  # Draw rectangle
+                    ax.text(i + 0.5, 0.5, label, ha='center', va='center', fontsize=6.0)  # Add text inside the rectangles
+
+                ax.set_xlim(0, 6)
+                ax.set_ylim(0, 1)
+                ax.axis('off')  # Remove axes
+
+                # Add an arrow pointing from "Highest" to "Lowest"
+                ax.annotate('', xy=(6, 1), xytext=(0, 1),
+                            arrowprops=dict(facecolor='black', shrink=0.04, width=1.2, headwidth=5))
+
+                return fig
+
+            # Call the function to plot the legend and display it in Streamlit
+            legend_fig = plot_color_legend()
+            st.pyplot(legend_fig)            
+
 
 ######################################################################################################################################
 ######################################################################################################################################
@@ -12132,3 +15600,30 @@ if choose == "Compare Jogadores":
         else:
             
             st.markdown("<h3 style='text-align: center; color: red; '><br><br>A comparação não é possível, pois os jogadores são de posições diferentes.</h3>", unsafe_allow_html=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
