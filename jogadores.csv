@@ -17,13 +17,13 @@ Anselmo Ramon,CRB,12,right,BRA2,2024,Atacante,Atacante
 Geovane,Grêmio Novorizontino,8,right,BRA2,2024,Segundo Volante,Segundo Volante
 Rafael Santos,Operário PR,0,right,BRA2,2024,Goleiro,Goleiro
 Rafael Donato,Grêmio Novorizontino,4,right,BRA2,2024,Zagueiro,Zagueiro
-Patric,,1,right,BRA2,2024,Lateral Direito,Lateral
+Patric,Amazonas,1,right,BRA2,2024,Lateral Direito,Lateral
 Eduardo Diniz,Ituano,1,left,BRA2,2024,Lateral Esquerdo,Lateral
 Willian Farias,Grêmio Novorizontino,8,right,BRA2,2024,Segundo Volante,Segundo Volante
 Rodrigo Lindoso,Operário PR,8,right,BRA2,2024,Segundo Volante,Segundo Volante
 Vladimir,Guarani,0,right,BRA2,2024,Goleiro,Goleiro
 Thiago Galhardo,Goiás,12,right,BRA2,2024,Atacante,Atacante
-Leandro Damião,,12,right,BRA2,2024,Atacante,Atacante
+Leandro Damião,Coritiba,12,right,BRA2,2024,Atacante,Atacante
 Julio Furch,Santos,12,right,BRA2,2024,Atacante,Atacante
 Giovanni Augusto,Chapecoense,9,right,BRA2,2024,Meia,Meia
 Luciano Castán,Sport Recife,4,left,BRA2,2024,Zagueiro,Zagueiro
@@ -106,7 +106,7 @@ César Martins,Grêmio Novorizontino,4,right,BRA2,2024,Zagueiro,Zagueiro
 Wellington Silva,Sport Recife,10,right,BRA2,2024,Extremo,Extremo
 Alex Ruan,Brusque,1,left,BRA2,2024,Lateral Esquerdo,Lateral
 Pedro Castro,Avaí,10,right,BRA2,2024,Extremo,Extremo
-Diogo Mateus,,1,right,BRA2,2024,Lateral Direito,Lateral
+Diogo Mateus,Guarani,1,right,BRA2,2024,Lateral Direito,Lateral
 Tárik,Chapecoense,7,right,BRA2,2024,Primeiro Volante,Primeiro Volante
 Caio Dantas,Guarani,12,right,BRA2,2024,Atacante,Atacante
 Ezequiel,Amazonas,1,right,BRA2,2024,Lateral Direito,Lateral
@@ -138,7 +138,7 @@ Gegé,CRB,9,left,BRA2,2024,Meia,Meia
 Marcos Serrato,Brusque,8,right,BRA2,2024,Segundo Volante,Segundo Volante
 Rodrigo,Ituano,7,right,BRA2,2024,Primeiro Volante,Primeiro Volante
 Marlon,América Mineiro,1,left,BRA2,2024,Lateral Esquerdo,Lateral
-Dudu Vieira,Juventude,7,right,BRA2,2024,Primeiro Volante,Primeiro Volante
+Dudu Vieira,Ponte Preta,7,right,BRA2,2024,Primeiro Volante,Primeiro Volante
 Brenner,América Mineiro,12,right,BRA2,2024,Atacante,Atacante
 Lucas Ramon,Mirassol,1,right,BRA2,2024,Lateral Direito,Lateral
 Pablo Dyego,Grêmio Novorizontino,10,right,BRA2,2024,Extremo,Extremo
@@ -162,7 +162,7 @@ Danielzinho,Mirassol,8,right,BRA2,2024,Segundo Volante,Segundo Volante
 Guilherme Xavier,Amazonas,7,left,BRA2,2024,Primeiro Volante,Primeiro Volante
 Joseph,Operário PR,4,right,BRA2,2024,Zagueiro,Zagueiro
 Rafael Ramos,Ceará,1,right,BRA2,2024,Lateral Direito,Lateral
-Diogo Silva,Tianjin Tigers,4,right,BRA2,2024,Zagueiro,Zagueiro
+Diogo Silva,Amazonas,4,right,BRA2,2024,Zagueiro,Zagueiro
 Willian Formiga,CRB,1,left,BRA2,2024,Lateral Esquerdo,Lateral
 Matheus Costa,Botafogo SP,4,right,BRA2,2024,Zagueiro,Zagueiro
 Douglas Baggio,Botafogo SP,10,right,BRA2,2024,Extremo,Extremo
@@ -172,7 +172,7 @@ Castro,Ponte Preta,7,right,BRA2,2024,Primeiro Volante,Primeiro Volante
 César Augusto,Avaí,0,right,BRA2,2024,Goleiro,Goleiro
 Yann Rolim,Ituano,9,right,BRA2,2024,Meia,Meia
 Éverton Brito,Ponte Preta,10,right,BRA2,2024,Extremo,Extremo
-J. Quintero,,4,right,BRA2,2024,Zagueiro,Zagueiro
+J. Quintero,Vila Nova,4,right,BRA2,2024,Zagueiro,Zagueiro
 Rodrigo Ferreira,Santos,1,right,BRA2,2024,Lateral Direito,Lateral
 Emerson Santos,Ponte Preta,7,right,BRA2,2024,Primeiro Volante,Primeiro Volante
 Éder,América Mineiro,4,right,BRA2,2024,Zagueiro,Zagueiro
@@ -188,7 +188,7 @@ Mateus Silva,Ponte Preta,4,right,BRA2,2024,Zagueiro,Zagueiro
 Elias,América Mineiro,0,right,BRA2,2024,Goleiro,Goleiro
 Lucas Hipólito,Operário PR,1,left,BRA2,2024,Lateral Esquerdo,Lateral
 Ianson,Brusque,4,right,BRA2,2024,Zagueiro,Zagueiro
-Lucas Dias,Muharraq,4,right,BRA2,2024,Zagueiro,Zagueiro
+Lucas Dias,Botafogo SP,4,right,BRA2,2024,Zagueiro,Zagueiro
 Alex Sandro,Botafogo SP,12,left,BRA2,2024,Atacante,Atacante
 Pará,Operário PR,1,left,BRA2,2024,Lateral Esquerdo,Lateral
 Mário Sérgio,Chapecoense,12,left,BRA2,2024,Atacante,Atacante
@@ -236,7 +236,7 @@ Isaque,Mirassol,9,right,BRA2,2024,Meia,Meia
 Dentinho,Brusque,10,left,BRA2,2024,Extremo,Extremo
 Ramon,Ponte Preta,8,left,BRA2,2024,Segundo Volante,Segundo Volante
 Patrick Brey,Botafogo SP,1,left,BRA2,2024,Lateral Esquerdo,Lateral
-Wálber,Nam Dinh,4,right,BRA2,2024,Zagueiro,Zagueiro
+Wálber,Ituano,4,right,BRA2,2024,Zagueiro,Zagueiro
 Saulo Mineiro,Ceará,12,right,BRA2,2024,Atacante,Atacante
 João Paulo,Chapecoense,4,left,BRA2,2024,Zagueiro,Zagueiro
 Jacy,Operário PR,7,right,BRA2,2024,Primeiro Volante,Primeiro Volante
@@ -275,8 +275,8 @@ Chico,Sport Recife,4,left,BRA2,2024,Zagueiro,Zagueiro
 Hereda,CRB,1,right,BRA2,2024,Lateral Direito,Lateral
 Matheus Felipe,Ceará,4,right,BRA2,2024,Zagueiro,Zagueiro
 Leozinho,Ituano,10,left,BRA2,2024,Extremo,Extremo
-Léo Santos,Nacional,4,right,BRA2,2024,Zagueiro,Zagueiro
-Joaquim,Tigres UANL,4,right,BRA2,2024,Zagueiro,Zagueiro
+Léo Santos,Guarani,4,right,BRA2,2024,Zagueiro,Zagueiro
+Joaquim,Santos,4,right,BRA2,2024,Zagueiro,Zagueiro
 Lucas Ribeiro,Goiás,4,right,BRA2,2024,Zagueiro,Zagueiro
 Gustavo Coutinho,Sport Recife,12,right,BRA2,2024,Atacante,Atacante
 Zé Gabriel,Coritiba,8,right,BRA2,2024,Segundo Volante,Segundo Volante
@@ -285,7 +285,7 @@ Juninho,Paysandu,9,right,BRA2,2024,Meia,Meia
 Alesson,Vila Nova,10,right,BRA2,2024,Extremo,Extremo
 Breno Herculano,Goiás,12,right,BRA2,2024,Atacante,Atacante
 João Victor,Guarani,10,right,BRA2,2024,Extremo,Extremo
-Geovane,Portimonense,8,left,BRA2,2024,Segundo Volante,Segundo Volante
+Geovane,Vila Nova,8,left,BRA2,2024,Segundo Volante,Segundo Volante
 Luiz Henrique,Goiás,1,left,BRA2,2024,Lateral Esquerdo,Lateral
 Bernardo Schappo,Botafogo SP,4,left,BRA2,2024,Zagueiro,Zagueiro
 Gabriel Novaes,Ponte Preta,12,right,BRA2,2024,Atacante,Atacante
@@ -296,29 +296,29 @@ Ericson,Botafogo SP,4,right,BRA2,2024,Zagueiro,Zagueiro
 Júnior Brumado,Coritiba,12,right,BRA2,2024,Atacante,Atacante
 Rafael Carvalheira,Chapecoense,8,left,BRA2,2024,Segundo Volante,Segundo Volante
 Diego Mathias,Brusque,10,left,BRA2,2024,Extremo,Extremo
-Paulo Vitor,Portimonense,10,right,BRA2,2024,Extremo,Extremo
+Paulo Vitor,Grêmio Novorizontino,10,right,BRA2,2024,Extremo,Extremo
 Vinicius Diniz,Operário PR,7,right,BRA2,2024,Primeiro Volante,Primeiro Volante
 Paulo Baya,Goiás,10,right,BRA2,2024,Extremo,Extremo
 Lucas Gazal,Mirassol,4,right,BRA2,2024,Zagueiro,Zagueiro
 Matheus Bahia,Ceará,1,left,BRA2,2024,Lateral Esquerdo,Lateral
 Matheus Régis,Ponte Preta,10,right,BRA2,2024,Extremo,Extremo
 João Pedro,CRB,7,right,BRA2,2024,Primeiro Volante,Primeiro Volante
-Warley,Torpedo Kutaisi,1,right,BRA2,2024,Lateral Direito,Lateral
+Warley,Mirassol,1,right,BRA2,2024,Lateral Direito,Lateral
 Gustavo Henrique,CRB,4,right,BRA2,2024,Zagueiro,Zagueiro
 Jeh,Ponte Preta,12,right,BRA2,2024,Atacante,Atacante
-João Pedro Chermont,Santos U20,1,right,BRA2,2024,Lateral Direito,Lateral
+João Pedro Chermont,Santos,1,right,BRA2,2024,Lateral Direito,Lateral
 Adyson,América Mineiro,10,left,BRA2,2024,Extremo,Extremo
-Jair,Santos U20,4,right,BRA2,2024,Zagueiro,Zagueiro
-João Costa,Botafogo SP U20,7,right,BRA2,2024,Primeiro Volante,Primeiro Volante
-João Gabriel,Ponte Preta U23,1,unknown,BRA2,2024,Erro,Erro
+Jair,Santos,4,right,BRA2,2024,Zagueiro,Zagueiro
+João Costa,Botafogo SP,7,right,BRA2,2024,Primeiro Volante,Primeiro Volante
+João Gabriel,Ponte Preta,1,unknown,BRA2,2024,Erro,Erro
 Richard,Ituano,1,left,BRA2,2024,Lateral Esquerdo,Lateral
 Daniel Lima,Operário PR,12,right,BRA2,2024,Atacante,Atacante
-Lucas Ronier,Coritiba U20,10,left,BRA2,2024,Extremo,Extremo
+Lucas Ronier,Coritiba,10,left,BRA2,2024,Extremo,Extremo
 Cauan Barros,Amazonas,8,right,BRA2,2024,Segundo Volante,Segundo Volante
-Pedro Morisco,Coritiba U20,0,right,BRA2,2024,Goleiro,Goleiro
+Pedro Morisco,Coritiba,0,right,BRA2,2024,Goleiro,Goleiro
 Renato Marques,América Mineiro,12,right,BRA2,2024,Atacante,Atacante
 Rodrigo Gelado,Coritiba,1,left,BRA2,2024,Lateral Esquerdo,Lateral
-Luisão,Grêmio Novorizontino U20,4,right,BRA2,2024,Zagueiro,Zagueiro
+Luisão,Grêmio Novorizontino,4,right,BRA2,2024,Zagueiro,Zagueiro
 Ruan Ribeiro,Paysandu,12,right,BRA2,2024,Atacante,Atacante
 Felipe Amaral,América Mineiro,7,right,BRA2,2024,Primeiro Volante,Primeiro Volante
 Rodriguinho,América Mineiro,10,right,BRA2,2024,Extremo,Extremo
@@ -335,7 +335,7 @@ Figueiredo,Coritiba,10,right,BRA2,2024,Extremo,Extremo
 Miquéias,Ituano,8,right,BRA2,2024,Segundo Volante,Segundo Volante
 Wallison,Botafogo SP,1,right,BRA2,2024,Lateral Direito,Lateral
 Chrystian Barletta,Sport Recife,10,left,BRA2,2024,Extremo,Extremo
-Habraão,Santa Clara,4,right,BRA2,2024,Zagueiro,Zagueiro
+Habraão,Chapecoense,4,right,BRA2,2024,Zagueiro,Zagueiro
 Dodô,Ponte Preta,11,right,BRA2,2024,Extremo,Extremo
 Reinaldo,Guarani,10,right,BRA2,2024,Extremo,Extremo
 Emerson Urso,Vila Nova,10,right,BRA2,2024,Extremo,Extremo
@@ -343,7 +343,7 @@ JP Galvão,Chapecoense,1,right,BRA2,2024,Lateral Direito,Lateral
 J. Torres,Brusque,1,left,BRA2,2024,Lateral Esquerdo,Lateral
 Vini Paulista,Coritiba,7,right,BRA2,2024,Primeiro Volante,Primeiro Volante
 Carlão,Paysandu,4,right,BRA2,2024,Zagueiro,Zagueiro
-Juan Christian,Alanyaspor,10,right,BRA2,2024,Extremo,Extremo
+Juan Christian,Vila Nova,10,right,BRA2,2024,Extremo,Extremo
 Enio,Amazonas,10,right,BRA2,2024,Extremo,Extremo
 Vinícius Pavia,Ituano,10,right,BRA2,2024,Extremo,Extremo
 Cristiano,Vila Nova,8,right,BRA2,2024,Segundo Volante,Segundo Volante
