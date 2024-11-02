@@ -35,7 +35,7 @@ with st.sidebar:
 if choose == "Melhores do Brasileirão-2024":
     
     #CABEÇALHO DO FORM
-    st.markdown("<h1 style='text-align: center;'>Melhores do Brasileirão até a Rodada 31</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>Melhores do Brasileirão (Série B) até a Rodada 34</h1>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align: center;'>app by @JAmerico1898</h6>", unsafe_allow_html=True)
     st.markdown("---")
 
@@ -4271,13 +4271,13 @@ if choose == "Melhores do Brasileirão-2024":
 elif choose == "Ranking de Jogadores":
     
     #CABEÇALHO DO FORM
-    st.markdown("<h1 style='text-align: center;'>Melhores do Brasileirão até a Rodada 31</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>Melhores do Brasileirão (Série B) até a Rodada 34</h1>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align: center;'>app by @JAmerico1898</h6>", unsafe_allow_html=True)
     st.markdown("---")
 
     
     st.markdown("<h2 style='text-align: center;'>Ranking de Jogadores</h2>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align: center;'>Série A - 2024</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>Série B - 2024</h3>", unsafe_allow_html=True)
     st.markdown("---")
     jogadores = st.selectbox("Digite o nome de seu jogador. A grafia deve ser exata!", options=jogadores, index=None, placeholder="Jogador")
     temporada = 2024
@@ -10890,12 +10890,12 @@ elif choose == "Ranking de Jogadores":
 if choose == "Compare Jogadores":
     
     #CABEÇALHO DO FORM
-    st.markdown("<h1 style='text-align: center;'>Melhores do Brasileirão até a Rodada 31</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>Melhores do Brasileirão (Série B) até a Rodada 34</h1>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align: center;'>app by @JAmerico1898</h6>", unsafe_allow_html=True)
     st.markdown("---")
 
     st.markdown("<h2 style='text-align: center;'>Compare Jogadores</h2>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align: center;'>Série A - 2024</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>Série B - 2024</h3>", unsafe_allow_html=True)
     st.markdown("---")
 
     
